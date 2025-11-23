@@ -1,4 +1,7 @@
+"use client";
+
 import { ReactNode } from "react";
+import { motion } from "framer-motion";
 
 interface ParchmentBackgroundProps {
   children: ReactNode;
@@ -6,7 +9,10 @@ interface ParchmentBackgroundProps {
 
 export function ParchmentBackground({ children }: ParchmentBackgroundProps) {
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#E1D6C7] via-[#D8CBBB] to-[#E1D6C7] px-4 py-12 sm:px-6 md:px-8 lg:py-16">
+    <motion.div
+      className="relative min-h-screen w-full overflow-hidden bg-linear-to-br from-[#E1D6C7] via-[#D8CBBB] to-[#E1D6C7] px-4 py-12 sm:px-6 md:px-8 lg:py-16"
+      layoutId="parchment-bg"
+    >
       {/* Subtle paper texture overlay */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -21,6 +27,6 @@ export function ParchmentBackground({ children }: ParchmentBackgroundProps) {
       <div className="absolute bottom-8 right-8 h-16 w-16 border-b-2 border-r-2 border-[#370D10]/10 sm:h-24 sm:w-24" />
 
       {children}
-    </div>
+    </motion.div>
   );
 }

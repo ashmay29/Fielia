@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import EnvelopeSequence from "@/components/envelope/EnvelopeSequence";
 
 export default function HomePage() {
-  redirect("/envelope");
+  return <EnvelopeSequence />;
 }

@@ -1,88 +1,90 @@
-export function EnvelopeFlap() {
+import { motion } from "framer-motion";
+
+interface EnvelopeFlapProps {
+  isOpen?: boolean;
+}
+
+export function EnvelopeFlap({ isOpen = false }: EnvelopeFlapProps) {
   return (
     <>
-      {/* --- TOP FLAP --- */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(46,5,6,0.85) 0%, rgba(64,19,18,0.6) 60%, transparent 100%)",
-          clipPath:
-            "path('M 0 0 H 100% L 50% 55% Q 50% 48% 0 0 Z')"
+      {/* --- TOP FLAP (Animated) --- */}
+      <motion.div
+        className="absolute inset-0 origin-top z-30"
+        initial={{ rotateX: 0 }}
+        animate={{
+          rotateX: isOpen ? -180 : 0,
         }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(10,10,8,0.45) 0%, transparent 50%)",
-          clipPath:
-            "path('M 0 0 H 100% L 50% 55% Q 50% 48% 0 0 Z')"
-        }}
-      />
+        transition={{ duration: 1.2, ease: "easeInOut" }}
+        style={{ transformStyle: "preserve-3d", transformOrigin: "top" }}
+      >
+        {/* Front of the flap (Closed state) */}
+        <div
+          className="absolute inset-0 backface-hidden"
+          style={{ backfaceVisibility: "hidden" }}
+        >
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="w-full h-full"
+          >
+            <defs>
+              <linearGradient
+                id="flap-front-gradient"
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop offset="0%" stopColor="rgba(46,5,6,0.85)" />
+                <stop offset="60%" stopColor="rgba(64,19,18,0.6)" />
+                <stop offset="100%" stopColor="transparent" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 0 0 L 100 0 L 50 55 Q 50 48 0 0 Z"
+              fill="url(#flap-front-gradient)"
+              stroke="#E1D6C7"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
 
-      {/* Subtle curved notch shadow under flap */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-[calc(55%-1rem)] h-16 w-64 -translate-x-1/2 opacity-35"
-        style={{
-          background:
-            "radial-gradient(80% 60% at 50% 0%, rgba(10,10,8,0.6) 0%, rgba(10,10,8,0.35) 35%, transparent 70%)"
-        }}
-      />
-
-      {/* --- BOTTOM FLAP --- */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(64,19,18,0.75) 0%, rgba(80,21,21,0.5) 50%, transparent 100%)",
-          clipPath: "polygon(0 100%, 100% 100%, 50% 55%)"
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(10,10,8,0.45) 0%, transparent 45%)",
-          clipPath: "polygon(0 100%, 100% 100%, 50% 55%)"
-        }}
-      />
-
-      {/* --- LEFT FLAP --- */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to right, rgba(46,5,6,0.8) 0%, rgba(64,19,18,0.55) 50%, transparent 100%)",
-          clipPath: "polygon(0 0, 0 100%, 50% 55%)"
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to right, rgba(10,10,8,0.4) 0%, transparent 40%)",
-          clipPath: "polygon(0 0, 0 100%, 50% 55%)"
-        }}
-      />
-
-      {/* --- RIGHT FLAP --- */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to left, rgba(46,5,6,0.8) 0%, rgba(64,19,18,0.55) 50%, transparent 100%)",
-          clipPath: "polygon(100% 0, 100% 100%, 50% 55%)"
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to left, rgba(10,10,8,0.4) 0%, transparent 40%)",
-          clipPath: "polygon(100% 0, 100% 100%, 50% 55%)"
-        }}
-      />
+        {/* Back of the flap (Open state) */}
+        <div
+          className="absolute inset-0 backface-hidden"
+          style={{ transform: "rotateX(180deg)", backfaceVisibility: "hidden" }}
+        >
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="w-full h-full"
+          >
+            <defs>
+              <linearGradient
+                id="flap-back-gradient"
+                x1="0%"
+                y1="100%"
+                x2="0%"
+                y2="0%"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop offset="0%" stopColor="rgba(46,5,6,0.85)" />
+                <stop offset="60%" stopColor="rgba(64,19,18,0.6)" />
+                <stop offset="100%" stopColor="transparent" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 0 0 L 100 0 L 50 55 Q 50 48 0 0 Z"
+              fill="url(#flap-back-gradient)"
+              stroke="#E1D6C7"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
+      </motion.div>
     </>
   );
 }
