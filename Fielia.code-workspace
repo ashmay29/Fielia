@@ -1,6 +1,12 @@
 {
   "folders": [
-    { "name": "root", "path": "." },
-    { "name": "vista", "path": "apps/vista" }
+    {
+      "name": "root",
+      "path": "."
+    },
+    {
+      "name": "vista",
+      "path": "apps/vista"
+    }
   ]
 }

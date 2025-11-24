@@ -1,45 +1,62 @@
-import { Button } from "@/components/ui/Button";
-import { EnvelopeFlap } from "@/components/envelope/EnvelopeFlap";
-import { WaxSeal } from "@/components/envelope/WaxSeal";
+"use client";
+
+import { useEffect, useState } from "react";
+import { EnvelopeAnimation } from "@/components/envelope/EnvelopeAnimation";
+import { InvitationContent } from "@/components/invitation/InvitationContent";
 
 export default function EnvelopePage() {
+  const [showInvitation, setShowInvitation] = useState<boolean>(false);
+
+  // After mount, reconcile with persisted state without affecting initial hydration
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("fielia_envelope_opened") === "true") {
+        // Defer the state transition to the next frame to avoid strict effect lints
+        requestAnimationFrame(() => setShowInvitation(true));
+      }
+    } catch {}
+  }, []);
+
+  const handleAnimationComplete = () => {
+    try {
+      localStorage.setItem("fielia_envelope_opened", "true");
+    } catch {}
+    console.log("[Analytics] Envelope animation completed");
+    setShowInvitation(true);
+  };
+
+  const handleAnimationStart = () => {
+    console.log("[Analytics] Envelope animation started");
+  };
+
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-[#501515] via-[#370D10] to-[#2E0506]">
-      {/* Envelope creases matching sketch */}
-      <EnvelopeFlap />
-
-      {/* Wax seal at center */}
-      <WaxSeal />
-
-      {/* Vignette overlay */}
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-[#0A0A08]/60" />
-
-      {/* Content */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-between px-6 py-16">
-        
-        {/* Top tagline */}
-        <p className="font-[family-name:var(--font-cormorant)] text-sm uppercase tracking-[0.3em] text-[#E1D6C7] sm:text-base">
-          An invite-only bar and supper club
-        </p>
-
-        {/* Middle spacer for seal */}
-        <div />
-
-        {/* Bottom section */}
-        <div className="flex flex-col items-center gap-6">
-          <Button
-            href="/invitation"
-            variant="secondary"
-            className="px-12 py-4 text-base sm:px-14 sm:py-4 sm:text-lg"
-          >
-            Open Invitation
-          </Button>
-
-          <p className="font-[family-name:var(--font-cormorant)] text-xs tracking-wider text-[#D8CBBB]/70 sm:text-sm">
-            Membership by referral only
-          </p>
-        </div>
+    <main className="relative min-h-screen w-full bg-[#501515]">
+      {/* Layer 1: The Video/Envelope */}
+      <div
+        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+          showInvitation ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+        suppressHydrationWarning
+        aria-hidden={showInvitation}
+      >
+        {!showInvitation && (
+          <EnvelopeAnimation
+            onStart={handleAnimationStart}
+            onComplete={handleAnimationComplete}
+          />
+        )}
       </div>
-    </div>
+
+      {/* Layer 2: Invitation Content */}
+      <div
+        className={`absolute inset-0 z-30 transition-opacity duration-1000 ease-out ${
+          showInvitation ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        suppressHydrationWarning
+        aria-hidden={!showInvitation}
+      >
+        <InvitationContent />
+      </div>
+    </main>
   );
 }
