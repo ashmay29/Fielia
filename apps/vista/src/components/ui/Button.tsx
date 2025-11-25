@@ -14,7 +14,7 @@ export function Button({
   className = "",
   ...props 
 }: ButtonProps) {
-  const baseStyles = "rounded-sm font-[family-name:var(--font-cormorant)] font-medium tracking-wide transition-all duration-300";
+  const baseStyles = "rounded font-[family-name:var(--font-cormorant)] font-medium tracking-wide transition-all duration-300";
   
   const variants = {
     primary: "bg-[#370D10] text-[#E1D6C7] hover:bg-[#501515]",

@@ -1,4 +1,4 @@
-import { Logo } from "@/components/ui/Logo";
+import { SharedLogo } from "@/components/ui/SharedLogo";
 import { ParchmentBackground } from "@/components/invitation/ParchmentBackground";
 import { InvitationCard } from "@/components/invitation/InvitationCard";
 import { ReferralForm } from "@/components/invitation/ReferralForm";
@@ -10,7 +10,7 @@ export default function InvitationPage() {
       <InvitationCard>
         {/* Header */}
         <div className="relative mb-8 flex items-center justify-between border-b border-[#370D10]/10 pb-6">
-          <Logo size="small" />
+          <SharedLogo size="small" />
           <span className="font-[family-name:var(--font-cormorant)] text-xs uppercase tracking-[0.2em] text-[#370D10]/60 sm:text-sm">
             Private Invitation
           </span>
@@ -31,7 +31,8 @@ export default function InvitationPage() {
           </p>
           <p>
             Its minimalist bar, EDIT by Fay Barretto, and supper club by Chef
-            Hitesh Shanbhag offer an experience defined by restraint and elegance.
+            Hitesh Shanbhag offer an experience defined by restraint and
+            elegance.
           </p>
           <p>
             Membership is private and by referral only — a world where
@@ -50,9 +51,12 @@ export default function InvitationPage() {
               Dress Code
             </h3>
             <p className="mt-2 font-[family-name:var(--font-cormorant)] text-[#370D10]/80">
-              The club observes an elegant dress code for all members and their guests.
+              The club observes an elegant dress code for all members and their
+              guests.
             </p>
-            <div className="mt-3 font-[family-name:var(--font-cormorant)] text-[#501515]">→</div>
+            <div className="mt-3 font-[family-name:var(--font-cormorant)] text-[#501515]">
+              →
+            </div>
           </div>
 
           {/* Card 2 */}
@@ -64,9 +68,12 @@ export default function InvitationPage() {
               Club Rules
             </h3>
             <p className="mt-2 font-[family-name:var(--font-cormorant)] text-[#370D10]/80">
-              Members are expected to be familiar with our rules and ensure their guests adhere to them.
+              Members are expected to be familiar with our rules and ensure
+              their guests adhere to them.
             </p>
-            <div className="mt-3 font-[family-name:var(--font-cormorant)] text-[#501515]">→</div>
+            <div className="mt-3 font-[family-name:var(--font-cormorant)] text-[#501515]">
+              →
+            </div>
           </div>
 
           {/* Card 3 */}
@@ -78,9 +85,12 @@ export default function InvitationPage() {
               Cultural Programme
             </h3>
             <p className="mt-2 font-[family-name:var(--font-cormorant)] text-[#370D10]/80">
-              Conversations, gallery evenings, wine dinners and more—curated for quiet sophistication.
+              Conversations, gallery evenings, wine dinners and more—curated for
+              quiet sophistication.
             </p>
-            <div className="mt-3 font-[family-name:var(--font-cormorant)] text-[#501515]">→</div>
+            <div className="mt-3 font-[family-name:var(--font-cormorant)] text-[#501515]">
+              →
+            </div>
           </div>
         </section>
 
