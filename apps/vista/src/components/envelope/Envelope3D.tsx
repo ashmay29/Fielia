@@ -1,27 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { WaxSeal } from "./WaxSeal";
 import { EnvelopeFlap } from "./EnvelopeFlap";
 import { PocketLeft, PocketRight, PocketBottom } from "./EnvelopePockets";
-import { SharedLogo } from "../ui/SharedLogo";
-import { Button } from "@/components/ui/Button";
+import { InvitationContent } from "@/components/invitation/InvitationContent";
+import { SharedLogo } from "@/components/ui/SharedLogo";
 
-export function Envelope3D({ onOpen }: { onOpen: () => void }) {
-  const [isOpen, setIsOpen] = useState(false);
+// Animation phases
+type AnimationPhase = "closed" | "opening" | "zooming" | "revealing" | "done";
 
-  const handleOpen = () => {
-    if (isOpen) return;
-    setIsOpen(true);
+export function Envelope3D({ onOpen: _onOpen }: { onOpen: () => void }) {
+  const [phase, setPhase] = useState<AnimationPhase>("closed");
+  const isOpen = phase !== "closed";
 
-    // Navigate after animation completes
-    // Flap (1.2s) + Card delay (0.6s) + Card animation (1.5s) = 3.3s
-    // + Pause (0.2s) = 3.5s total
+  const handleOpen = useCallback(() => {
+    if (phase !== "closed") return;
+    setPhase("opening");
+
+    // Sequence:
+    // 1. Open Flap & Slide Card Up (starts immediately)
+    // 2. Zoom Card to Full Screen (starts after card is revealed)
     setTimeout(() => {
-      onOpen();
-    }, 3500);
-  };
+      setPhase("zooming");
+    }, 2500); // 1.2s flap + 1.3s card slide overlap
+
+    // 3. Reveal Content (starts after zoom finishes)
+    setTimeout(() => {
+      setPhase("revealing");
+    }, 3500); // 2.5s + 1s zoom
+
+    // 4. Notify parent/cleanup (optional, kept for robustness)
+    setTimeout(() => {
+      setPhase("done");
+      // onOpen(); // We don't need to navigate away anymore, we stay here.
+    }, 4500);
+  }, [phase]);
+
+  useEffect(() => {
+    // Auto-open on mount
+    const timer = setTimeout(() => {
+      handleOpen();
+    }, 500); // Small delay to ensure smooth entry
+
+    return () => clearTimeout(timer);
+  }, [handleOpen]);
 
   // Custom bezier curve for "Heavy Paper" feel (starts fast, ends slow)
   const paperPhysics = {
@@ -38,15 +62,18 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
   return (
     <motion.div
       // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
-      className="relative flex min-h-screen w-full flex-col items-center justify-end overflow-hidden pb-16"
+      className="relative flex min-h-screen w-full flex-col items-center justify-end pb-16"
       style={{
         background: `radial-gradient(circle at center, var(--fielia-3) 0%, var(--fielia-2) 40%, var(--fielia-4) 100%)`,
+        overflow: ["zooming", "revealing", "done"].includes(phase)
+          ? "visible"
+          : "hidden",
       }}
     >
       {/* Background Elements */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
         {/* Large Watermark */}
-        <span className="font-[family-name:var(--font-great-vibes)] translate-y-[-10%] select-none text-[25vw] text-[var(--fielia-6)] opacity-[0.03] blur-sm">
+        <span className="font-(family-name:--font-great-vibes) translate-y-[-10%] select-none text-[25vw] text-surface opacity-[0.03] blur-sm">
           Fielia
         </span>
 
@@ -73,7 +100,7 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
         animate={{ opacity: isOpen ? 0 : 1 }}
         transition={{ duration: 0.5 }}
       >
-        <p className="font-[family-name:var(--font-cormorant)] text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-[#E1D6C7]/80">
+        <p className="font-(family-name:--font-cormorant) text-sm sm:text-base font-semibold uppercase tracking-[0.3em] text-[#E1D6C7]/80">
           An invite-only bar and supper club
         </p>
       </motion.div>
@@ -84,13 +111,19 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
         style={{
           width: "min(600px, 90vw)", // Responsive width
           aspectRatio: "3 / 2", // Standard envelope ratio
-          perspective: "1200px", // Critical for 3D effect
+          perspective: ["zooming", "revealing", "done"].includes(phase)
+            ? "none"
+            : "1200px", // Remove 3D context during zoom
         }}
       >
         {/* Container: Preserves 3D space for children */}
         <div
           className="relative h-full w-full"
-          style={{ transformStyle: "preserve-3d" }}
+          style={{
+            transformStyle: ["zooming", "revealing", "done"].includes(phase)
+              ? "flat"
+              : "preserve-3d",
+          }}
         >
           {/* LAYER 1: Back Panel */}
           <div
@@ -100,32 +133,75 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
 
           {/* LAYER 2: The Invitation Card */}
           <motion.div
-            // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
-            className="absolute inset-x-4 top-4 bottom-4 flex items-start justify-center bg-[#E1D6C7] pt-8 shadow-md"
-            initial={{ y: 0, zIndex: 20 }}
-            animate={isOpen ? { y: -220, zIndex: 20 } : { y: 0, zIndex: 20 }}
-            transition={{
-              y: {
-                ...cardReveal,
-                delay: 1, // Wait 1s for flap to open more before sliding
-              },
-              zIndex: { delay: 0 }, // No delay for z-index
-            }}
+            // @ts-expect-error - Framer Motion type issue
+            className={`absolute flex items-start justify-center bg-[#E1D6C7] pt-8 shadow-md ${
+              ["zooming", "revealing", "done"].includes(phase)
+                ? "fixed inset-0 z-50 h-full w-full overflow-y-auto"
+                : "inset-x-4 top-4 bottom-4" // Normal card position constrained to envelope
+            }`}
+            initial={{ y: 0, zIndex: 20, scale: 1 }}
+            animate={
+              phase === "zooming" || phase === "revealing" || phase === "done"
+                ? {
+                    y: 0,
+                    x: 0,
+                    scale: 1,
+                    zIndex: 50,
+                    borderRadius: 0,
+                    transition: { duration: 1.5, ease: [0.22, 1, 0.36, 1] }, // Ultra-smooth easeOutQuint
+                  }
+                : isOpen
+                ? { y: -220, zIndex: 20 }
+                : { y: 0, zIndex: 20 }
+            }
+            transition={
+              // Use different transitions for different properties if needed
+              phase === "zooming"
+                ? { duration: 1.5, ease: "easeInOut" }
+                : {
+                    y: { ...cardReveal, delay: 1 },
+                    zIndex: { delay: 0 },
+                  }
+            }
           >
-            <div className="flex flex-col items-center gap-2">
-              <SharedLogo size="small" />
-              <span className="font-[family-name:var(--font-cormorant)] text-sm uppercase tracking-widest text-[#370D10]/70">
-                You are invited
-              </span>
+            {/* Inner Content Container */}
+            <div className="w-full h-full relative">
+              {/* Initial Small Content (Logo + Text) - Fades out during zoom/reveal */}
+              <motion.div
+                // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
+                className="absolute top-8 left-0 right-0 flex flex-col items-center gap-2"
+                animate={{
+                  opacity: phase === "revealing" || phase === "done" ? 0 : 1,
+                }}
+              >
+                <SharedLogo size="small" />
+                <span className="font-(family-name:--font-cormorant) text-sm uppercase tracking-widest text-[#370D10]/70">
+                  You are invited
+                </span>
+              </motion.div>
+
+              {/* Full Invitation Content - Fades in after zoom */}
+              {["revealing", "done"].includes(phase) && (
+                <div className="absolute inset-0">
+                  <InvitationContent visible={true} />
+                </div>
+              )}
             </div>
           </motion.div>
 
           {/* LAYER 3: Pockets (Static Overlay - Always on top) */}
-          <div className="absolute inset-0 z-30 pointer-events-none">
+          <motion.div
+            // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
+            className="absolute inset-0 z-30 pointer-events-none"
+            animate={{
+              opacity: ["zooming", "revealing", "done"].includes(phase) ? 0 : 1,
+            }}
+            transition={{ duration: 0.5 }}
+          >
             <PocketLeft />
             <PocketRight />
             <PocketBottom />
-          </div>
+          </motion.div>
 
           {/* LAYER 4: Rotating Flap (On top when closed, below card when open) */}
           <motion.div
@@ -183,22 +259,6 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
           </motion.div>
         </div>
       </div>
-
-      {/* Trigger Button */}
-      <motion.div
-        // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
-        className="absolute bottom-24 z-40"
-        animate={{ opacity: isOpen ? 0 : 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Button
-          onClick={handleOpen}
-          variant="secondary"
-          className="min-w-[240px] px-8 py-3 text-lg tracking-widest"
-        >
-          Open Invitation
-        </Button>
-      </motion.div>
     </motion.div>
   );
 }
