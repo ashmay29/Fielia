@@ -1,30 +1,22 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import SpotlightCursor from '@/components/landing/SpotlightCursor';
-import FieliaMonogram from '@/components/landing/FieliaMonogram';
-import InvitationScreen from '@/components/landing/InvitationScreen';
-import MainWebsite from '@/components/landing/MainWebsite';
-import EntranceText from '@/components/landing/EntranceText';
+"use client";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import SpotlightCursor from "@/components/landing/SpotlightCursor";
+
+import InvitationScreen from "@/components/landing/InvitationScreen";
+import MainWebsite from "@/components/landing/MainWebsite";
+import EntranceText from "@/components/landing/EntranceText";
 
 export default function HomePage() {
   // Stage 1: Spotlight reveal of F logo
   const [showSpotlight, setShowSpotlight] = useState(true);
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [logoRevealed, setLogoRevealed] = useState(false);
 
   // Stage 2: Invitation card
   const [showInvitation, setShowInvitation] = useState(false);
 
   // Stage 3: Main website
   const [showMainWebsite, setShowMainWebsite] = useState(false);
-
-  // Track cursor position for monogram proximity detection
-  if (typeof window !== 'undefined' && showSpotlight) {
-    window.addEventListener('mousemove', (e) => {
-      setCursorPosition({ x: e.clientX, y: e.clientY });
-    });
-  }
+  const [isTransitioningToMain, setIsTransitioningToMain] = useState(false);
 
   // Automatic transition after "You may enter" completes
   const handleEntranceComplete = () => {
@@ -32,12 +24,20 @@ export default function HomePage() {
     setShowInvitation(true);
   };
 
-  const handleInvitationEnter = () => {
-    // InvitationScreen handles zoom animation (1000ms - faster transition)
-    setTimeout(() => {
+  useEffect(() => {
+    if (!isTransitioningToMain) return;
+
+    const timer = setTimeout(() => {
       setShowInvitation(false);
       setShowMainWebsite(true);
+      setIsTransitioningToMain(false);
     }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isTransitioningToMain]);
+
+  const handleInvitationEnter = () => {
+    setIsTransitioningToMain(true);
   };
 
   // Temporary navigation handlers for dev purposes
@@ -45,20 +45,21 @@ export default function HomePage() {
     setShowMainWebsite(false);
     setShowSpotlight(false);
     setShowInvitation(true);
-    setLogoRevealed(false);
   };
 
   const handleNavigateToSpotlight = () => {
     setShowMainWebsite(false);
     setShowInvitation(false);
     setShowSpotlight(true);
-    setLogoRevealed(false);
   };
 
-  const MotionDiv = motion.div as any;
+  const MotionDiv = motion.div as React.ElementType;
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ backgroundColor: 'hsl(350 40% 8%)' }}>
+    <div
+      className="relative min-h-screen overflow-hidden"
+      style={{ backgroundColor: "hsl(350 40% 8%)" }}
+    >
       {/* Stage 1: Cinematic entrance with spotlight */}
       <MotionDiv
         className="absolute inset-0"
@@ -73,10 +74,10 @@ export default function HomePage() {
             <div
               className="absolute inset-0 high-quality-bg"
               style={{
-                backgroundImage: 'url(/satinbg.jpeg)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
+                backgroundImage: "url(/satinbg.jpeg)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
             />
 
@@ -84,10 +85,12 @@ export default function HomePage() {
             <MotionDiv
               className="absolute inset-0"
               initial={{
-                background: 'radial-gradient(ellipse at center, hsl(350 45% 10% / 0.98) 0%, hsl(350 40% 7% / 0.99) 40%, hsl(350 35% 5% / 1.00) 70%, hsl(350 30% 3% / 1.00) 100%)',
+                background:
+                  "radial-gradient(ellipse at center, hsl(350 45% 10% / 0.98) 0%, hsl(350 40% 7% / 0.99) 40%, hsl(350 35% 5% / 1.00) 70%, hsl(350 30% 3% / 1.00) 100%)",
               }}
               animate={{
-                background: 'radial-gradient(ellipse at center, hsl(350 45% 10% / 0.50) 0%, hsl(350 40% 7% / 0.75) 40%, hsl(350 35% 5% / 0.95) 70%, hsl(350 30% 3% / 1.00) 100%)',
+                background:
+                  "radial-gradient(ellipse at center, hsl(350 45% 10% / 0.50) 0%, hsl(350 40% 7% / 0.75) 40%, hsl(350 35% 5% / 0.95) 70%, hsl(350 30% 3% / 1.00) 100%)",
               }}
               transition={{
                 duration: 3,
