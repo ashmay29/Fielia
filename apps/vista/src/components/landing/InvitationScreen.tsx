@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 
@@ -13,12 +13,12 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
   const keyholeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (keyholeRef.current && typeof window !== 'undefined') {
+    if (keyholeRef.current && typeof window !== "undefined") {
       const rect = keyholeRef.current.getBoundingClientRect();
       // Target the center of the keyhole image
       // For the PNG image, we want to zoom from the center of the circular part
       const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + (rect.height * 0.12); // Adjusted to target the circular part at the top of the keyhole
+      const centerY = rect.top + rect.height * 0.12; // Adjusted to target the circular part at the top of the keyhole
       setTransformOrigin(`${centerX}px ${centerY}px`);
     }
   }, [isVisible]);
@@ -46,8 +46,8 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         scale: {
           duration: 1.4,
           ease: [0.76, 0, 0.24, 1], // Smoother easing curve
-          type: "tween" // Force tween for smooth animation
-        }
+          type: "tween", // Force tween for smooth animation
+        },
       }}
       style={{
         pointerEvents: isVisible && !isZooming ? "auto" : "none",
@@ -59,10 +59,10 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: 'url(/goldrosebg.jpeg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          backgroundImage: "url(/goldrosebg.jpeg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       />
 
@@ -82,7 +82,6 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
 
       {/* Removed black fade overlay for seamless parchment transition */}
 
-
       {/* Subtle velvet texture */}
       <div
         className="absolute inset-0 opacity-[0.06]"
@@ -95,7 +94,8 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
       <div
         className="absolute inset-0"
         style={{
-          background: 'radial-gradient(ellipse at 50% 50%, hsl(350 55% 15% / 0.4) 0%, transparent 60%)',
+          background:
+            "radial-gradient(ellipse at 50% 50%, hsl(350 55% 15% / 0.4) 0%, transparent 60%)",
         }}
       />
 
@@ -103,8 +103,9 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
       <MotionDiv
         className="relative max-w-md w-full mx-6 p-10 md:p-14"
         style={{
-          background: 'linear-gradient(180deg, hsl(350 40% 12%) 0%, hsl(350 45% 9%) 100%)',
-          border: '1px solid hsl(42 40% 35% / 0.25)',
+          background:
+            "linear-gradient(180deg, hsl(350 40% 12%) 0%, hsl(350 45% 9%) 100%)",
+          border: "1px solid hsl(42 40% 35% / 0.25)",
           boxShadow: `
             0 30px 80px hsl(350 50% 5% / 0.6),
             inset 0 1px 0 hsl(42 40% 40% / 0.1),
@@ -122,13 +123,12 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         {/* Invitation Border */}
         <div className="absolute inset-0 pointer-events-none">
           <img
-            src="/invitation-border.jpeg"
+            src="/invitation-border.png"
             alt=""
             className="w-full h-full"
-            style={{ objectFit: 'contain' }}
+            style={{ objectFit: "contain" }}
           />
         </div>
-
 
         {/* Content */}
         <div className="relative text-center">
@@ -140,10 +140,38 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
             transition={{ duration: 1, delay: 1.6 }}
           >
             <svg width="100" height="16" viewBox="0 0 100 16">
-              <line x1="0" y1="8" x2="30" y2="8" stroke="hsl(42 50% 50%)" strokeWidth="0.4" opacity="0.6" />
-              <path d="M40 8 L45 4 L50 8 L45 12 Z" fill="none" stroke="hsl(42 50% 50%)" strokeWidth="0.4" opacity="0.7" />
-              <path d="M50 8 L55 4 L60 8 L55 12 Z" fill="none" stroke="hsl(42 50% 50%)" strokeWidth="0.4" opacity="0.7" />
-              <line x1="70" y1="8" x2="100" y2="8" stroke="hsl(42 50% 50%)" strokeWidth="0.4" opacity="0.6" />
+              <line
+                x1="0"
+                y1="8"
+                x2="30"
+                y2="8"
+                stroke="hsl(42 50% 50%)"
+                strokeWidth="0.4"
+                opacity="0.6"
+              />
+              <path
+                d="M40 8 L45 4 L50 8 L45 12 Z"
+                fill="none"
+                stroke="hsl(42 50% 50%)"
+                strokeWidth="0.4"
+                opacity="0.7"
+              />
+              <path
+                d="M50 8 L55 4 L60 8 L55 12 Z"
+                fill="none"
+                stroke="hsl(42 50% 50%)"
+                strokeWidth="0.4"
+                opacity="0.7"
+              />
+              <line
+                x1="70"
+                y1="8"
+                x2="100"
+                y2="8"
+                stroke="hsl(42 50% 50%)"
+                strokeWidth="0.4"
+                opacity="0.6"
+              />
             </svg>
           </MotionDiv>
 
@@ -198,9 +226,8 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
             transition={{ duration: 1, delay: 2.6 }}
           >
-            Behind closed doors, where the refined gather.
-            An evening of discretion, rare spirits,
-            and conversations that never leave.
+            Behind closed doors, where the refined gather. An evening of
+            discretion, rare spirits, and conversations that never leave.
           </MotionDiv>
 
           {/* Exclusive details */}
@@ -214,7 +241,7 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
               Admission by referral only
             </p>
             <p className="text-foreground/40 text-[10px] font-[family-name:var(--font-cormorant)] italic">
-              "The password changes with the moon"
+              The password changes with the moon
             </p>
           </MotionDiv>
 
@@ -246,7 +273,8 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
                 <div
                   className="absolute top-1/4 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full"
                   style={{
-                    background: 'radial-gradient(circle, hsl(42 60% 50% / 0.3) 0%, transparent 70%)',
+                    background:
+                      "radial-gradient(circle, hsl(42 60% 50% / 0.3) 0%, transparent 70%)",
                   }}
                 />
               </div>
@@ -283,7 +311,8 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, transparent 40%, hsl(350 40% 5% / 0.5) 100%)",
+          background:
+            "radial-gradient(ellipse at center, transparent 40%, hsl(350 40% 5% / 0.5) 100%)",
         }}
       />
     </MotionDiv>

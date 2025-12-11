@@ -2,7 +2,7 @@
     "name": "fielia",
     "version": "1.0.0",
     "private": true,
-    "packageManager": "pnpm@10.15.0",
+    "packageManager": "pnpm@10.14.0",
     "scripts": {
       "preinstall": "npx only-allow pnpm",
       "dev": "turbo run dev --parallel",
