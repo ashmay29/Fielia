@@ -26,7 +26,7 @@ const FieliaMonogram = ({ isRevealed, onReveal, cursorPosition }: FieliaMonogram
     );
 
     const isNearLogo = isMounted && distance < 150;
-    const opacity = isNearLogo ? Math.max(0.3, 1 - distance / 200) : 0.05;
+    const opacity = isNearLogo ? Math.max(0.15, 1 - distance / 200) : 0.03;
 
     return (
         <MotionDiv
@@ -36,11 +36,10 @@ const FieliaMonogram = ({ isRevealed, onReveal, cursorPosition }: FieliaMonogram
             transition={{ duration: 1.5 }}
         >
             <MotionDiv
-                className="relative cursor-pointer"
-                onClick={onReveal}
+                className="relative"
                 animate={{
                     opacity: isRevealed ? 1 : opacity,
-                    scale: isRevealed ? 1.1 : isNearLogo ? 1.02 : 1,
+                    scale: isNearLogo ? 1.02 : 1,
                 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
             >
@@ -148,17 +147,6 @@ const FieliaMonogram = ({ isRevealed, onReveal, cursorPosition }: FieliaMonogram
                     />
                 </div>
 
-                {/* Instruction text */}
-                <MotionDiv
-                    as="p"
-                    className="absolute -bottom-16 left-1/2 -translate-x-1/2 text-champagne-muted text-sm tracking-widest whitespace-nowrap font-[family-name:var(--font-playfair)]"
-                    animate={{
-                        opacity: isNearLogo && !isRevealed ? 0.8 : 0,
-                    }}
-                    transition={{ duration: 0.3 }}
-                >
-                    Click to enter
-                </MotionDiv>
             </MotionDiv>
         </MotionDiv>
     );

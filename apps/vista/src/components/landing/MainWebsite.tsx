@@ -2,9 +2,11 @@ import { motion } from "framer-motion";
 
 interface MainWebsiteProps {
     isVisible: boolean;
+    onNavigateToInvitation?: () => void;
+    onNavigateToSpotlight?: () => void;
 }
 
-const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
+const MainWebsite = ({ isVisible, onNavigateToInvitation, onNavigateToSpotlight }: MainWebsiteProps) => {
     const MotionDiv = motion.div as any;
     const MotionH1 = motion.h1 as any;
     const MotionP = motion.p as any;
@@ -29,6 +31,45 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
                 pointerEvents: isVisible ? "auto" : "none",
             }}
         >
+            {/* Temporary Dev Navigation Bar */}
+            {(onNavigateToInvitation || onNavigateToSpotlight) && (
+                <div
+                    className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex gap-3 px-4 py-2 rounded-lg"
+                    style={{
+                        background: 'linear-gradient(180deg, hsl(350 50% 28%) 0%, hsl(350 55% 22%) 100%)',
+                        border: '1px solid hsl(42 50% 45% / 0.3)',
+                        boxShadow: '0 4px 20px hsl(350 50% 15% / 0.5)',
+                    }}
+                >
+                    {onNavigateToSpotlight && (
+                        <button
+                            onClick={onNavigateToSpotlight}
+                            className="px-4 py-2 text-[10px] tracking-widest uppercase transition-all duration-300 hover:bg-white/10 rounded"
+                            style={{
+                                fontFamily: 'var(--font-cormorant), serif',
+                                fontWeight: 500,
+                                color: 'hsl(40 35% 92%)',
+                            }}
+                        >
+                            → Spotlight Screen
+                        </button>
+                    )}
+                    {onNavigateToInvitation && (
+                        <button
+                            onClick={onNavigateToInvitation}
+                            className="px-4 py-2 text-[10px] tracking-widest uppercase transition-all duration-300 hover:bg-white/10 rounded"
+                            style={{
+                                fontFamily: 'var(--font-cormorant), serif',
+                                fontWeight: 500,
+                                color: 'hsl(40 35% 92%)',
+                            }}
+                        >
+                            → Invitation Screen
+                        </button>
+                    )}
+                </div>
+            )}
+
             {/* Enhanced parchment texture with grain */}
             <div
                 className="fixed inset-0 pointer-events-none opacity-[0.15]"

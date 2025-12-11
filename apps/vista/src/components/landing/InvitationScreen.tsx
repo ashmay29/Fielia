@@ -43,7 +43,7 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         scale: isZooming ? 300 : 1,
       }}
       transition={{
-        opacity: { duration: 2, delay: isZooming ? 0 : 0.5 },
+        opacity: { duration: 0.8, delay: 0, ease: "easeInOut" },
         scale: {
           duration: 1.4,
           ease: [0.76, 0, 0.24, 1], // Smoother easing curve
@@ -51,19 +51,35 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         }
       }}
       style={{
-        background: `
-          radial-gradient(ellipse at center, 
-            hsl(350 45% 10%) 0%, 
-            hsl(350 40% 7%) 50%,
-            hsl(350 35% 5%) 100%
-          )
-        `,
         pointerEvents: isVisible && !isZooming ? "auto" : "none",
         transformOrigin: transformOrigin,
         willChange: isZooming ? "transform, opacity" : "auto",
-        backgroundColor: "transparent", // Ensure no black background
       }}
     >
+      {/* High-quality gold rose background image */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: 'url(/goldrosebg.jpeg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+
+      {/* Dark maroon gradient overlay to maintain aesthetic */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at center, 
+              hsl(350 45% 10% / 0.85) 0%, 
+              hsl(350 40% 7% / 0.90) 50%,
+              hsl(350 35% 5% / 0.95) 100%
+            )
+          `,
+        }}
+      />
 
       {/* Removed black fade overlay for seamless parchment transition */}
 
