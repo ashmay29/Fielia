@@ -11,8 +11,8 @@ const EntranceText = ({ startDelay, onComplete }: EntranceTextProps) => {
     const MotionP = motion.p as any;
 
     useEffect(() => {
-        // Total duration: startDelay (3s) + fade-in (1.5s) + hold (0.8s) + fade-out (0.8s) = 6.1s
-        const totalDuration = startDelay + 1500 + 800 + 800;
+        // Total duration: startDelay (3s) + fade-in (2.5s) + hold (1s) + fade-out (0.8s) = 7.3s
+        const totalDuration = startDelay + 2500 + 1000 + 800;
 
         const timer = setTimeout(() => {
             onComplete();
@@ -43,8 +43,8 @@ const EntranceText = ({ startDelay, onComplete }: EntranceTextProps) => {
                 ],
             }}
             transition={{
-                duration: 4.1,  // Total animation duration (faster)
-                times: [0, 0.73, 0.93, 0.98, 1], // Adjusted keyframe timing
+                duration: 5.3,  // Total animation duration (slower for more dramatic effect)
+                times: [0, 0.57, 0.85, 0.92, 1], // Adjusted keyframe timing for slower fade-in
                 ease: "easeInOut",
             }}
         >

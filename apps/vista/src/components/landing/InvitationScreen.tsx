@@ -15,11 +15,10 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
   useEffect(() => {
     if (keyholeRef.current && typeof window !== 'undefined') {
       const rect = keyholeRef.current.getBoundingClientRect();
-      // Target the center of the keyhole circle (upper portion)
-      // The SVG keyhole circle is at cy="12" out of viewBox height 40
-      // Adjusted to 25% to move zoom origin higher
+      // Target the center of the keyhole image
+      // For the PNG image, we want to zoom from the center of the circular part
       const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + (rect.height * 0.15); // Much higher - 15% from top
+      const centerY = rect.top + (rect.height * 0.12); // Adjusted to target the circular part at the top of the keyhole
       setTransformOrigin(`${centerX}px ${centerY}px`);
     }
   }, [isVisible]);
@@ -73,9 +72,9 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         style={{
           background: `
             radial-gradient(ellipse at center, 
-              hsl(350 45% 10% / 0.85) 0%, 
-              hsl(350 40% 7% / 0.90) 50%,
-              hsl(350 35% 5% / 0.95) 100%
+              hsl(350 45% 10% / 0.70) 0%, 
+              hsl(350 40% 7% / 0.78) 50%,
+              hsl(350 35% 5% / 0.85) 100%
             )
           `,
         }}
@@ -120,34 +119,16 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         }}
         transition={{ duration: 1.4, delay: 1, ease: "easeOut" }}
       >
-        {/* Art deco corner decorations - gold on dark */}
-        <div className="absolute top-3 left-3 w-10 h-10">
-          <svg viewBox="0 0 40 40" className="w-full h-full">
-            <path d="M0 0 L40 0 L40 3 L3 3 L3 40 L0 40 Z" fill="none" stroke="hsl(42 55% 45%)" strokeWidth="0.5" opacity="0.5" />
-            <path d="M8 8 L20 8 L20 11 L11 11 L11 20 L8 20 Z" fill="none" stroke="hsl(350 50% 40%)" strokeWidth="0.3" opacity="0.6" />
-          </svg>
-        </div>
-        <div className="absolute top-3 right-3 w-10 h-10 rotate-90">
-          <svg viewBox="0 0 40 40" className="w-full h-full">
-            <path d="M0 0 L40 0 L40 3 L3 3 L3 40 L0 40 Z" fill="none" stroke="hsl(42 55% 45%)" strokeWidth="0.5" opacity="0.5" />
-            <path d="M8 8 L20 8 L20 11 L11 11 L11 20 L8 20 Z" fill="none" stroke="hsl(350 50% 40%)" strokeWidth="0.3" opacity="0.6" />
-          </svg>
-        </div>
-        <div className="absolute bottom-3 left-3 w-10 h-10 -rotate-90">
-          <svg viewBox="0 0 40 40" className="w-full h-full">
-            <path d="M0 0 L40 0 L40 3 L3 3 L3 40 L0 40 Z" fill="none" stroke="hsl(42 55% 45%)" strokeWidth="0.5" opacity="0.5" />
-            <path d="M8 8 L20 8 L20 11 L11 11 L11 20 L8 20 Z" fill="none" stroke="hsl(350 50% 40%)" strokeWidth="0.3" opacity="0.6" />
-          </svg>
-        </div>
-        <div className="absolute bottom-3 right-3 w-10 h-10 rotate-180">
-          <svg viewBox="0 0 40 40" className="w-full h-full">
-            <path d="M0 0 L40 0 L40 3 L3 3 L3 40 L0 40 Z" fill="none" stroke="hsl(42 55% 45%)" strokeWidth="0.5" opacity="0.5" />
-            <path d="M8 8 L20 8 L20 11 L11 11 L11 20 L8 20 Z" fill="none" stroke="hsl(350 50% 40%)" strokeWidth="0.3" opacity="0.6" />
-          </svg>
+        {/* Invitation Border */}
+        <div className="absolute inset-0 pointer-events-none">
+          <img
+            src="/invitation-border.jpeg"
+            alt=""
+            className="w-full h-full"
+            style={{ objectFit: 'contain' }}
+          />
         </div>
 
-        {/* Inner border - subtle gold */}
-        <div className="absolute inset-5 border border-accent/15" />
 
         {/* Content */}
         <div className="relative text-center">
@@ -249,64 +230,16 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
               onClick={handleKeyholeClick}
               className="relative group cursor-pointer bg-transparent border-none p-2"
               style={{
-                cursor: 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23C9A227\' stroke-width=\'1.5\'><circle cx=\'8\' cy=\'8\' r=\'5\'/><path d=\'M10.5 10.5L21 21\'/><path d=\'M15 15l2 2\'/><path d=\'M18 18l2 2\'/></svg>") 0 0, pointer',
+                cursor: 'url("/keycursor-large-rotated.png") 24 24, pointer',
               }}
               aria-label="Enter Fielia"
             >
-              {/* Keyhole SVG */}
-              <svg
-                width="28"
-                height="40"
-                viewBox="0 0 28 40"
-                className="transition-all duration-500 group-hover:drop-shadow-[0_0_8px_hsl(42_60%_50%/0.6)]"
-              >
-                {/* Keyhole shape */}
-                <defs>
-                  <linearGradient id="keyholeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="hsl(42, 50%, 35%)" />
-                    <stop offset="100%" stopColor="hsl(42, 40%, 25%)" />
-                  </linearGradient>
-                </defs>
-                {/* Circle part of keyhole */}
-                <circle
-                  cx="14"
-                  cy="12"
-                  r="8"
-                  fill="none"
-                  stroke="url(#keyholeGradient)"
-                  strokeWidth="1.5"
-                  className="transition-all duration-500 group-hover:stroke-[hsl(42,60%,55%)]"
-                />
-                {/* Inner keyhole - split into circle (parchment) and tail (dark) */}
-                {/* Circle part - parchment color */}
-                <circle
-                  cx="14"
-                  cy="12"
-                  r="4"
-                  fill="hsl(35 30% 88%)"
-                  stroke="url(#keyholeGradient)"
-                  strokeWidth="0.5"
-                />
-                {/* Tail/ribbon part - dark color */}
-                <path
-                  d="M11 14 L10 32 L14 28 L18 32 L17 14"
-                  fill="hsl(350, 40%, 6%)"
-                  stroke="url(#keyholeGradient)"
-                  strokeWidth="0.8"
-                  className="transition-all duration-500 group-hover:stroke-[hsl(42,60%,55%)]"
-                />
-                {/* Decorative outer ring */}
-                <circle
-                  cx="14"
-                  cy="12"
-                  r="10"
-                  fill="none"
-                  stroke="hsl(42, 45%, 40%)"
-                  strokeWidth="0.3"
-                  opacity="0.5"
-                  className="transition-all duration-500 group-hover:opacity-80"
-                />
-              </svg>
+              {/* Keyhole Image */}
+              <img
+                src="/keyhole.png"
+                alt="Keyhole"
+                className="w-auto h-16 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_hsl(42_60%_50%/0.7)] group-hover:brightness-110"
+              />
 
               {/* Subtle glow on hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
