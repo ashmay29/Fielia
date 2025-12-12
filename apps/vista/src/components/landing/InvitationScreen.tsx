@@ -129,12 +129,12 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         transition={{ duration: 1.4, delay: 1, ease: "easeOut" }}
       >
         {/* Invitation Border */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <img
             src="/invitation-border.png"
             alt=""
-            className="w-full h-full"
-            style={{ objectFit: "contain" }}
+            className="w-full h-full scale-[1.12]"
+            style={{ objectFit: "fill" }}
           />
         </div>
 
@@ -269,7 +269,7 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
               <img
                 src="/keyhole.png"
                 alt="Keyhole"
-                className="w-auto h-16 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_hsl(42_60%_50%/0.7)] group-hover:brightness-110"
+                className="w-auto h-20 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_hsl(42_60%_50%/0.7)] group-hover:brightness-110"
               />
 
               {/* Subtle glow on hover */}
