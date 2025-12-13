@@ -37,7 +37,6 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
 
   return (
     <motion.div
-      // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
       className="relative flex min-h-screen w-full flex-col items-center justify-end overflow-hidden pb-16"
       style={{
         background: `radial-gradient(circle at center, var(--fielia-3) 0%, var(--fielia-2) 40%, var(--fielia-4) 100%)`,
@@ -68,7 +67,6 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
 
       {/* Top Heading */}
       <motion.div
-        // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
         className="absolute top-24 z-20 text-center px-4"
         animate={{ opacity: isOpen ? 0 : 1 }}
         transition={{ duration: 0.5 }}
@@ -100,7 +98,6 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
 
           {/* LAYER 2: The Invitation Card */}
           <motion.div
-            // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
             className="absolute inset-x-4 top-4 bottom-4 flex items-start justify-center bg-[#E1D6C7] pt-8 shadow-md"
             initial={{ y: 0, zIndex: 20 }}
             animate={isOpen ? { y: -220, zIndex: 20 } : { y: 0, zIndex: 20 }}
@@ -129,7 +126,6 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
 
           {/* LAYER 4: Rotating Flap (On top when closed, below card when open) */}
           <motion.div
-            // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
             className="absolute inset-x-0 top-0 h-[52%] origin-top"
             initial={{ rotateX: 0, zIndex: 35 }}
             animate={
@@ -167,7 +163,6 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
 
           {/* LAYER 5: Wax Seal (Always on top, rotates with flap) */}
           <motion.div
-            // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
             className="absolute inset-x-0 top-0 z-40 h-[52%] origin-top pointer-events-none"
             initial={{ rotateX: 0 }}
             animate={isOpen ? { rotateX: 180 } : { rotateX: 0 }}
@@ -186,7 +181,6 @@ export function Envelope3D({ onOpen }: { onOpen: () => void }) {
 
       {/* Trigger Button */}
       <motion.div
-        // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
         className="absolute bottom-24 z-40"
         animate={{ opacity: isOpen ? 0 : 1 }}
         transition={{ duration: 0.5 }}
