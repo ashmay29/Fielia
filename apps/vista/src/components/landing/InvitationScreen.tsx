@@ -63,50 +63,6 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
         willChange: isZooming ? "transform, opacity" : "auto",
       }}
     >
-      {/* High-quality gold rose background image */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: "url(/goldrosebg.jpeg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
-
-      {/* Dark maroon gradient overlay to maintain aesthetic */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(ellipse at center, 
-              hsl(350 45% 10% / 0.70) 0%, 
-              hsl(350 40% 7% / 0.78) 50%,
-              hsl(350 35% 5% / 0.85) 100%
-            )
-          `,
-        }}
-      />
-
-      {/* Removed black fade overlay for seamless parchment transition */}
-
-      {/* Subtle velvet texture */}
-      <div
-        className="absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
-
-      {/* Warm maroon glow in center */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 50%, hsl(350 55% 15% / 0.4) 0%, transparent 60%)",
-        }}
-      />
-
       {/* Invitation card - darker, more mysterious */}
       <MotionDiv
         className="relative max-w-md w-full mx-6 p-10 md:p-14"
@@ -120,13 +76,18 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
             0 0 100px hsl(350 50% 20% / 0.2)
           `,
         }}
-        initial={{ opacity: 0, y: 30, scale: 0.97 }}
+        initial={{ opacity: 0, y: 30, scale: 0.95, filter: "blur(10px)" }}
         animate={{
           opacity: isVisible && !isZooming ? 1 : 0,
           y: isVisible ? 0 : 30,
-          scale: isVisible ? 1 : 0.97,
+          scale: isVisible ? 1 : 0.95,
+          filter: isVisible ? "blur(0px)" : "blur(10px)",
         }}
-        transition={{ duration: 1.4, delay: 1, ease: "easeOut" }}
+        transition={{
+          duration: 1.8,
+          delay: 0.5, // Start sooner but take longer
+          ease: [0.25, 0.4, 0.25, 1], // Custom cubic bezier for "cinematic" feel
+        }}
       >
         {/* Invitation Border */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -185,7 +146,7 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
 
           {/* Cryptic welcome - speakeasy style */}
           <MotionP
-            className="text-accent/50 text-[10px] tracking-[0.5em] uppercase font-(family-name:--font-cormorant)"
+            className="text-[#C5A572]/70 text-[10px] tracking-[0.5em] uppercase font-(family-name:--font-cormorant)"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
             transition={{ duration: 1, delay: 1.8 }}
@@ -195,7 +156,7 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
 
           {/* Main title - elegant */}
           <MotionH1
-            className="text-foreground text-4xl md:text-5xl font-(family-name:--font-playfair) italic mb-1 tracking-wide"
+            className="text-[#C5A572] text-5xl md:text-7xl font-(family-name:--font-playfair) italic mb-2 tracking-wide"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
             transition={{ duration: 1, delay: 2 }}
@@ -205,7 +166,7 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
 
           {/* Subtle tagline */}
           <MotionP
-            className="text-muted-foreground/60 text-[9px] tracking-[0.5em] uppercase mb-6 font-(family-name:--font-cormorant)"
+            className="text-[#C5A572]/50 text-[10px] tracking-[0.5em] uppercase mb-6 font-(family-name:--font-cormorant)"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
             transition={{ duration: 1, delay: 2.2 }}
@@ -220,12 +181,12 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
             animate={{ opacity: isVisible ? 1 : 0, scaleX: isVisible ? 1 : 0 }}
             transition={{ duration: 1.2, delay: 2.4 }}
           >
-            <div className="w-20 h-px bg-linear-to-r from-transparent via-accent/40 to-transparent" />
+            <div className="w-20 h-px bg-linear-to-r from-transparent via-[#C5A572]/40 to-transparent" />
           </MotionDiv>
 
           {/* Mysterious description - secretive */}
           <MotionP
-            className="text-foreground/50 text-xs leading-relaxed font-(family-name:--font-cormorant) max-w-[260px] mx-auto mb-6 italic"
+            className="text-[#E1D6C7]/70 text-sm leading-relaxed font-(family-name:--font-cormorant) max-w-[280px] mx-auto mb-6 italic"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
             transition={{ duration: 1, delay: 2.6 }}
@@ -241,18 +202,15 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 8 }}
             transition={{ duration: 1, delay: 2.8 }}
           >
-            <p className="text-accent/40 text-[8px] tracking-[0.4em] uppercase font-(family-name:--font-cormorant)">
+            <p className="text-[#C5A572]/40 text-[9px] tracking-[0.3em] uppercase font-(family-name:--font-cormorant)">
               Admission by referral only
-            </p>
-            <p className="text-foreground/40 text-[10px] font-(family-name:--font-cormorant) italic">
-              The password changes with the moon
             </p>
           </MotionDiv>
 
           {/* Interactive Keyhole */}
           <MotionDiv
             ref={keyholeRef}
-            className="flex justify-center mt-6"
+            className="flex flex-col items-center justify-center mt-6 gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: isVisible ? 1 : 0 }}
             transition={{ duration: 1, delay: 3.2 }}
@@ -283,6 +241,11 @@ const InvitationScreen = ({ isVisible, onEnter }: InvitationScreenProps) => {
                 />
               </div>
             </button>
+
+            {/* Instruction Text */}
+            <p className="text-[#C5A572]/40 text-[8px] tracking-[0.2em] uppercase font-(family-name:--font-cormorant) animate-pulse">
+              Tap keyhole to enter
+            </p>
           </MotionDiv>
 
           {/* Bottom ornament */}

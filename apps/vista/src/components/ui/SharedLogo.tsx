@@ -10,7 +10,6 @@ interface SharedLogoProps {
 
 export function SharedLogo({ size = "small", className }: SharedLogoProps) {
   return (
-    // @ts-expect-error - Framer Motion v10 + React 19 type compatibility issue
     <motion.div layoutId="fielia-logo" className={className}>
       <Logo size={size} />
     </motion.div>
