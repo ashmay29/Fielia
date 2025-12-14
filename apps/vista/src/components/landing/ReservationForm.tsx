@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -16,18 +16,41 @@ export const ReservationForm = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [minDate, setMinDate] = useState("");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (e: any) => {
+  useEffect(() => {
+    const today = new Date();
+    const localDate =
+      today.getFullYear() +
+      "-" +
+      String(today.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(today.getDate()).padStart(2, "0");
+    // eslint-disable-next-line
+    setMinDate(localDate);
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     // Simulate API call
-    setTimeout(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
       setIsSubmitting(false);
       setIsSuccess(true);
     }, 1500);
@@ -120,7 +143,7 @@ export const ReservationForm = () => {
             className="bg-transparent border-b border-[#E1D6C7]/30 text-[#E1D6C7] focus:border-[#E1D6C7] rounded-none px-0"
             labelClassName="text-[#E1D6C7]"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Guests"
               name="guests"
@@ -137,6 +160,7 @@ export const ReservationForm = () => {
               label="Date"
               name="date"
               type="date"
+              min={minDate}
               value={formData.date}
               onChange={handleChange}
               required

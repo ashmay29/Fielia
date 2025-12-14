@@ -25,7 +25,8 @@ export default function HomePage() {
 
     setShowSpotlight(false);
     setShowInvitation(true);
-  }, [showInvitation, showMainWebsite]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Safe: this callback is only used to transition from initial state
 
   useEffect(() => {
     if (!isTransitioningToMain) return;

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import Navbar from "./Navbar";
 import { ReservationForm } from "./ReservationForm";
 import Footer from "./Footer";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 
 interface MainWebsiteProps {
   isVisible: boolean;
@@ -52,17 +52,33 @@ const MainWebsite = ({
     },
   };
 
+  const ticking = useRef(false);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const scrollTop = e.currentTarget.scrollTop;
+
+    if (!ticking.current) {
+      window.requestAnimationFrame(() => {
+        const shouldHideLogo = scrollTop > 0;
+        const shouldChangeColor = scrollTop > 100;
+
+        setIsLogoHidden(shouldHideLogo);
+        setIsColorChanged(shouldChangeColor);
+
+        ticking.current = false;
+      });
+
+      ticking.current = true;
+    }
+  }, []);
+
   return (
     <motion.div
       className="absolute inset-0 overflow-y-auto overflow-x-hidden"
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
       variants={containerVariants}
-      onScroll={(e: React.UIEvent<HTMLDivElement>) => {
-        const scrollTop = e.currentTarget.scrollTop;
-        setIsLogoHidden(scrollTop > 0);
-        setIsColorChanged(scrollTop > 100); // Delayed color change to reduce lag
-      }}
+      onScroll={handleScroll}
       style={{
         pointerEvents: isVisible ? "auto" : "none",
         // No background here - uses persistent satinbg.jpeg from page.tsx

@@ -1,6 +1,4 @@
-// No changes to imports here, just showing context
-// No changes to imports here, just showing context
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 interface NavbarProps {
   variants?: Variants;
@@ -128,7 +126,7 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
       </div>
 
       {/* Thin Golden Line at the bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-[#C5A572]/40" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-[#C5A572]/40" />
     </motion.header>
   );
 };
