@@ -1,3 +1,5 @@
+"use client";
+
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 
@@ -5,12 +7,16 @@ interface NavbarProps {
   variants?: Variants;
   isLogoHidden: boolean;
   isColorChanged: boolean;
+  textRadius?: number;
 }
 
-const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
+const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: NavbarProps) => {
   return (
     <motion.header
       className="sticky top-0 left-0 w-full z-50 border-b"
+      style={{
+        borderRadius: `0 0 ${textRadius}px ${textRadius}px`,
+      }}
       variants={variants}
       initial={false}
       animate={{
@@ -104,7 +110,7 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
               fontFamily: "var(--font-cormorant), serif",
             }}
           >
-            Private Dining
+            Private Cocktail Bar
           </p>
         </Link>
 
@@ -112,9 +118,9 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
         <nav>
           <ul className="flex flex-wrap justify-center gap-6 md:gap-12">
             {[
-              { label: "The Club" },
+              { label: "The Club", href: "/" },
               { label: "Membership", href: "/membership" },
-              { label: "Story" },
+              { label: "Story", href: "/story" },
               { label: "Dining" },
               { label: "Experience" },
             ].map((item) => (
@@ -152,7 +158,12 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
       </div>
 
       {/* Thin Golden Line at the bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-px bg-[#C5A572]/40" />
+      <div
+        className="absolute bottom-0 left-0 w-full h-px bg-[#C5A572]/40"
+        style={{
+          borderRadius: `0 0 ${textRadius}px ${textRadius}px`,
+        }}
+      />
     </motion.header>
   );
 };

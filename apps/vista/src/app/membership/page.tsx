@@ -236,20 +236,18 @@ const MembershipPage = () => {
               <div className="grid grid-cols-2 gap-4 mt-8">
                 <div className="relative h-64 border border-[#E1D6C7]/10 rounded-sm overflow-hidden group">
                   <Image
-                    src="https://placehold.co/600x800/1a0505/E1D6C7?text=Intimate+Spaces"
+                    src="/interior/DSC02056-Edit.jpg"
                     fill
                     alt="Intimate Spaces"
                     className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
-                    unoptimized
                   />
                 </div>
                 <div className="relative h-64 border border-[#E1D6C7]/10 rounded-sm overflow-hidden group">
                   <Image
-                    src="https://placehold.co/600x800/1a0505/E1D6C7?text=Curated+Details"
+                    src="/interior/DSC02065-Edit.jpg"
                     fill
                     alt="Curated Details"
                     className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
-                    unoptimized
                   />
                 </div>
               </div>
