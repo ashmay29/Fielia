@@ -1,8 +1,9 @@
 {
   "buildCommand": "pnpm build",
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --frozen-lockfile",
   "devCommand": "pnpm dev",
   "env": {
     "PNPM_HOME": ".pnpm"
-  }
+  },
+  "packageManager": "pnpm@10.14.0"
 }
