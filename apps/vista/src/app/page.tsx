@@ -1,71 +1,32 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
-import SpotlightCursor from "@/components/landing/SpotlightCursor";
 
-import InvitationScreen from "@/components/landing/InvitationScreen";
-import MainWebsite from "@/components/landing/MainWebsite";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import CurtainReveal from "@/components/landing/CurtainReveal";
 import EntranceText from "@/components/landing/EntranceText";
+import MainWebsite from "@/components/landing/MainWebsite";
 
 export default function HomePage() {
-  // Stage 1: Spotlight reveal of F logo
-  const [showSpotlight, setShowSpotlight] = useState(true);
-
-  // Stage 2: Invitation card
-  const [showInvitation, setShowInvitation] = useState(false);
-
-  // Stage 3: Main website
-  const [showMainWebsite, setShowMainWebsite] = useState(false);
-  const [isTransitioningToMain, setIsTransitioningToMain] = useState(false);
-
-  // Automatic transition after "You may enter" completes
-  const handleEntranceComplete = useCallback(() => {
-    // Prevent re-triggering if we are already past this stage
-    if (showInvitation || showMainWebsite) return;
-
-    setShowSpotlight(false);
-    setShowInvitation(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Safe: this callback is only used to transition from initial state
+  const [curtainDone, setCurtainDone] = useState(false);
+  const [showText, setShowText] = useState(false);
+  const [showSite, setShowSite] = useState(false);
 
   useEffect(() => {
-    if (!isTransitioningToMain) return;
-
-    const timer = setTimeout(() => {
-      setShowInvitation(false);
-      setShowMainWebsite(true);
-      setIsTransitioningToMain(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [isTransitioningToMain]);
-
-  const handleInvitationEnter = useCallback(() => {
-    setIsTransitioningToMain(true);
-  }, []);
-
-  // Temporary navigation handlers for dev purposes
-  const handleNavigateToInvitation = () => {
-    setShowMainWebsite(false);
-    setShowSpotlight(false);
-    setShowInvitation(true);
-  };
-
-  const handleNavigateToSpotlight = () => {
-    setShowMainWebsite(false);
-    setShowInvitation(false);
-    setShowSpotlight(true);
-  };
-
-  const MotionDiv = motion.div as React.ElementType;
+    if (curtainDone) {
+      // Text appears 400ms after curtains
+      setTimeout(() => setShowText(true), 400);
+      // Site appears after text completes (400ms delay + 4800ms animation + 200ms buffer = 5400ms)
+      setTimeout(() => setShowSite(true), 5400);
+    }
+  }, [curtainDone]);
 
   return (
     <div
       className="relative min-h-screen overflow-hidden"
       style={{ backgroundColor: "hsl(350 40% 8%)" }}
     >
-      {/* Persistent Satin Background - visible across transitions */}
-      <div
+      {/* Cinematic Satin Background Fade */}
+      <motion.div
         className="absolute inset-0 high-quality-bg"
         style={{
           backgroundImage: "url(/satinbg.jpeg)",
@@ -73,61 +34,34 @@ export default function HomePage() {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
         }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: curtainDone ? 1 : 0 }}
+        transition={{
+          duration: 6,
+          delay: 0.8,
+          ease: [0.16, 1, 0.3, 1], // Ultra-smooth exponential ease for organic feel
+        }}
       />
 
-      {/* Persistent Animated Overlay - starts nearly black, reveals wine-red edges */}
-      <MotionDiv
+      {/* Maroon Overlay - Visible Immediately */}
+      <div
         className="absolute inset-0"
-        initial={{
-          background:
-            "radial-gradient(ellipse at center, hsl(350 45% 10% / 0.98) 0%, hsl(350 40% 7% / 0.99) 40%, hsl(350 35% 5% / 1.00) 70%, hsl(350 30% 3% / 1.00) 100%)",
-        }}
-        animate={{
+        style={{
           background:
             "radial-gradient(ellipse at center, hsl(350 45% 10% / 0.50) 0%, hsl(350 40% 7% / 0.75) 40%, hsl(350 35% 5% / 0.95) 70%, hsl(350 30% 3% / 1.00) 100%)",
         }}
-        transition={{
-          duration: 3,
-          ease: "easeOut",
-        }}
       />
 
-      {/* Stage 1: Cinematic entrance with spotlight */}
-      <MotionDiv
-        className="absolute inset-0"
-        initial={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-        animate={{
-          opacity: showSpotlight ? 1 : 0,
-          filter: showSpotlight ? "blur(0px)" : "blur(10px)",
-          scale: showSpotlight ? 1 : 1.05,
-        }}
-        transition={{ duration: 1.5, ease: "easeInOut" }}
-        style={{ pointerEvents: showSpotlight ? "auto" : "none" }}
-      >
-        <div className="absolute inset-0">
-          <SpotlightCursor isActive={showSpotlight} />
-
-          {/* "You may enter" text */}
-          <EntranceText startDelay={3000} onComplete={handleEntranceComplete} />
-        </div>
-      </MotionDiv>
-
-      {/* Stage 2: Invitation card with keyhole */}
-      {showInvitation && (
-        <InvitationScreen
-          isVisible={showInvitation}
-          onEnter={handleInvitationEnter}
-        />
+      {/* Stage 1: Curtain Reveal */}
+      {!curtainDone && (
+        <CurtainReveal onComplete={() => setCurtainDone(true)} />
       )}
 
-      {/* Stage 3: Main website */}
-      {showMainWebsite && (
-        <MainWebsite
-          isVisible={showMainWebsite}
-          onNavigateToInvitation={handleNavigateToInvitation}
-          onNavigateToSpotlight={handleNavigateToSpotlight}
-        />
-      )}
+      {/* Stage 2: "You may enter" Text */}
+      {showText && <EntranceText startDelay={0} onComplete={() => { }} />}
+
+      {/* Stage 3: Main Website */}
+      {showSite && <MainWebsite isVisible={showSite} />}
     </div>
   );
 }

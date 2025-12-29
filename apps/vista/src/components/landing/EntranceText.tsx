@@ -1,28 +1,31 @@
 'use client';
+
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 
 interface EntranceTextProps {
-    startDelay: number;
+    startDelay: number; // in ms
     onComplete: () => void;
 }
 
 const EntranceText = ({ startDelay, onComplete }: EntranceTextProps) => {
-    const MotionP = motion.p as any;
+    const fadeInDuration = 3.2;
+    const holdDuration = 1;
+    const fadeOutDuration = 0.6;
+
+    const totalDuration =
+        startDelay / 1000 + fadeInDuration + holdDuration + fadeOutDuration;
 
     useEffect(() => {
-        // Total duration: startDelay (3s) + fade-in (2.5s) + hold (1s) + fade-out (0.8s) = 7.3s
-        const totalDuration = startDelay + 2500 + 1000 + 800;
-
         const timer = setTimeout(() => {
             onComplete();
-        }, totalDuration);
+        }, totalDuration * 1000);
 
         return () => clearTimeout(timer);
-    }, [startDelay, onComplete]);
+    }, [totalDuration, onComplete]);
 
     return (
-        <MotionP
+        <motion.p
             className="whispered-text fixed inset-0 flex items-center justify-center text-center px-6"
             style={{
                 fontFamily: 'var(--font-playfair), serif',
@@ -31,25 +34,28 @@ const EntranceText = ({ startDelay, onComplete }: EntranceTextProps) => {
                 color: 'hsl(34 30% 85%)',
                 pointerEvents: 'none',
                 zIndex: 10,
+                filter: 'blur(0.25px)',
             }}
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 0, scale: 0.985 }}
             animate={{
-                opacity: [
-                    0,           // Start invisible
-                    0,           // Stay invisible during delay
-                    0.45,        // Fade in to peak
-                    0.45,        // Hold at peak
-                    0,           // Fade out
-                ],
+                opacity: [0, 0.15, 1, 0],
+                scale: [0.985, 1, 1, 1.02],
             }}
             transition={{
-                duration: 5.3,  // Total animation duration (slower for more dramatic effect)
-                times: [0, 0.57, 0.85, 0.92, 1], // Adjusted keyframe timing for slower fade-in
-                ease: "easeInOut",
+                delay: startDelay / 1000,
+                duration: fadeInDuration + holdDuration + fadeOutDuration,
+                times: [
+                    0,                                      // start
+                    fadeInDuration / (fadeInDuration + holdDuration + fadeOutDuration),
+                    (fadeInDuration + holdDuration) /
+                    (fadeInDuration + holdDuration + fadeOutDuration),
+                    1                                       // end
+                ],
+                ease: [0.16, 1, 0.3, 1],
             }}
         >
             You may enter.
-        </MotionP>
+        </motion.p>
     );
 };
 

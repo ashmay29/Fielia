@@ -6,15 +6,9 @@ import { useState, useRef, useCallback } from "react";
 
 interface MainWebsiteProps {
   isVisible: boolean;
-  onNavigateToInvitation?: () => void;
-  onNavigateToSpotlight?: () => void;
 }
 
-const MainWebsite = ({
-  isVisible,
-  onNavigateToInvitation,
-  onNavigateToSpotlight,
-}: MainWebsiteProps) => {
+const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
   // Track separate states for logo collapse and color transition
   const [isLogoHidden, setIsLogoHidden] = useState(false);
   const [isColorChanged, setIsColorChanged] = useState(false);
@@ -133,19 +127,6 @@ const MainWebsite = ({
         </motion.div>
         {/* Footer */}
         <Footer />
-        {/* Temporary Dev Controls - Hidden/Subtle */}
-        {(onNavigateToInvitation || onNavigateToSpotlight) && (
-          <div className="fixed bottom-4 left-4 flex gap-2 opacity-0 hover:opacity-100 transition-opacity z-50">
-            {onNavigateToInvitation && (
-              <button
-                onClick={onNavigateToInvitation}
-                className="bg-black/20 text-xs p-1 rounded text-white"
-              >
-                Back
-              </button>
-            )}
-          </div>
-        )}
       </div>
     </motion.div>
   );

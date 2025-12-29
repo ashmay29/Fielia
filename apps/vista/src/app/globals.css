@@ -102,3 +102,53 @@ body {
   transform: translateZ(0);
   -webkit-font-smoothing: subpixel-antialiased;
 }
+
+/* Curtain Reveal Styles */
+.curtain {
+  position: absolute;
+  background:
+    radial-gradient(circle at 30% 50%,
+      rgba(255, 255, 255, 0.05),
+      transparent 60%),
+    linear-gradient(90deg,
+      #370d10,
+      #501515 35%,
+      #401312 65%,
+      #2e0506);
+  background-size: cover;
+  will-change: transform;
+}
+
+/* Desktop Curtains */
+.curtain-left {
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  box-shadow: inset -40px 0 70px rgba(0, 0, 0, 0.7);
+}
+
+.curtain-right {
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  box-shadow: inset 40px 0 70px rgba(0, 0, 0, 0.7);
+}
+
+/* Mobile Curtains */
+.curtain-top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  box-shadow: inset 0 -40px 70px rgba(0, 0, 0, 0.7);
+}
+
+.curtain-bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  box-shadow: inset 0 40px 70px rgba(0, 0, 0, 0.7);
+}
