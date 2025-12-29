@@ -146,7 +146,7 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
             />
             <div className="absolute inset-0 bg-black/40" />
           </div>
-          
+
           {/* Hero visual - Pure typography on background */}
           <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-12 pb-10 flex flex-col items-center justify-center text-center min-h-[70vh] sm:min-h-[75vh] md:min-h-[85vh]">
 
@@ -185,7 +185,7 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
               speed="5s"
             >
               <span
-                className="relative z-10 text-[#E1D6C7] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-xs sm:text-sm font-semibold transition-colors duration-300 group-hover:text-white px-6 sm:px-0"
+                className="relative text-[#E1D6C7] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-xs sm:text-sm font-semibold transition-colors duration-300 group-hover:text-white px-6 sm:px-0"
                 style={{ fontFamily: "var(--font-cormorant), serif" }}
               >
                 Apply for Membership
@@ -233,11 +233,10 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
 
               {/* Mobile-first copy stack pinned to bottom in a framed card */}
               <div
-                className={`absolute inset-x-0 bottom-0 md:hidden flex pb-5 ${
-                  panel.align === "right"
+                className={`absolute inset-x-0 bottom-0 md:hidden flex pb-5 ${panel.align === "right"
                     ? "justify-end pr-4 sm:pr-6"
                     : "justify-start pl-4 sm:pl-6"
-                }`}
+                  }`}
               >
                 <div
                   className="relative w-[86%] sm:w-[78%] max-w-[520px] bg-[#0c0507]/78 backdrop-blur-[8px] p-6 sm:p-7 border border-[#E1D6C7]/25 shadow-[0_16px_60px_rgba(0,0,0,0.6)] translate-y-3 group-hover:-translate-y-1 transition-transform duration-400"
@@ -275,9 +274,8 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
 
               {/* Desktop/tablet layout keeps directional alignment */}
               <div
-                className={`hidden md:flex absolute inset-y-0 ${
-                  panel.align === "right" ? "right-0" : "left-0"
-                } items-center`}
+                className={`hidden md:flex absolute inset-y-0 ${panel.align === "right" ? "right-0" : "left-0"
+                  } items-center`}
               >
                 <div
                   className="relative m-6 md:m-8 max-w-[620px] bg-black/45 backdrop-blur-[4px] p-6 md:p-8 border border-[#E1D6C7]/15 shadow-[0_20px_70px_rgba(0,0,0,0.45)]"

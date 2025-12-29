@@ -42,7 +42,7 @@ const masonryItems = [
   },
   {
     id: "6",
-    img: "/F&B/Brunt basque&cacao textures.JPG",
+    img: "/F&B/Burnt basque&cacao textures.JPG",
     url: "",
     height: 450,
   },
@@ -273,23 +273,31 @@ const MembershipPage = () => {
                   </p>
                 </div>
 
-                <form className="space-y-6">
+                <form
+                  className="space-y-6"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    // TODO: Implement form submission logic
+                  }}
+                >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
+                      <label htmlFor="fullName" className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
                         Full Name
                       </label>
                       <input
+                        id="fullName"
                         type="text"
                         className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors"
                         placeholder="Jane Doe"
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
+                      <label htmlFor="email" className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
                         Email Address
                       </label>
                       <input
+                        id="email"
                         type="email"
                         className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors"
                         placeholder="jane@example.com"
@@ -298,10 +306,11 @@ const MembershipPage = () => {
                   </div>
 
                   <div className="flex flex-col gap-2 pt-4">
-                    <label className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
+                    <label htmlFor="reason" className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
                       Reason for Interest
                     </label>
                     <textarea
+                      id="reason"
                       rows={3}
                       className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors resize-none"
                       placeholder="Tell us a bit about yourself..."

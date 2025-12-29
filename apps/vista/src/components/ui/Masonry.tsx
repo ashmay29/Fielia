@@ -203,7 +203,7 @@ const Masonry: React.FC<MasonryProps> = ({
 
     hasMounted.current = true;
     return () => ctx.revert();
-  }, [grid, stagger, animateFrom, blurToFocus, duration, ease]);
+  }, [grid, stagger, animateFrom, blurToFocus, duration, ease, containerRef]);
 
   const handleMouseEnter = (id: string, element: HTMLElement) => {
     if (scaleOnHover) {
@@ -241,7 +241,7 @@ const Masonry: React.FC<MasonryProps> = ({
           data-key={item.id}
           className="absolute box-content cursor-pointer overflow-hidden rounded-[10px]"
           style={{ willChange: "transform, width, height, opacity" }}
-          onClick={() => window.open(item.url, "_blank", "noopener")}
+          onClick={() => window.open(item.url, "_blank", "noopener,noreferrer")}
           onMouseEnter={(e) => handleMouseEnter(item.id, e.currentTarget)}
           onMouseLeave={(e) => handleMouseLeave(item.id, e.currentTarget)}
         >
@@ -255,7 +255,7 @@ const Masonry: React.FC<MasonryProps> = ({
               priority={index < 4}
             />
             {colorShiftOnHover && (
-              <div className="color-overlay absolute inset-0 bg-linear-to-tr from-pink-500/50 to-sky-500/50 opacity-0 pointer-events-none" />
+              <div className="color-overlay absolute inset-0 bg-gradient-to-tr from-pink-500/50 to-sky-500/50 opacity-0 pointer-events-none" />
             )}
           </div>
         </div>
