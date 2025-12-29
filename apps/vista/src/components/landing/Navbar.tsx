@@ -1,15 +1,22 @@
+"use client";
+
 import { motion, Variants } from "framer-motion";
+import Link from "next/link";
 
 interface NavbarProps {
   variants?: Variants;
   isLogoHidden: boolean;
   isColorChanged: boolean;
+  textRadius?: number;
 }
 
-const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
+const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: NavbarProps) => {
   return (
     <motion.header
       className="sticky top-0 left-0 w-full z-50 border-b"
+      style={{
+        borderRadius: `0 0 ${textRadius}px ${textRadius}px`,
+      }}
       variants={variants}
       initial={false}
       animate={{
@@ -42,7 +49,10 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
           transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }} // MATCH EXACTLY
           className="overflow-hidden flex justify-center"
         >
-          <div className="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-full border border-wine-rich/10 bg-white/10 backdrop-blur-sm shadow-inner">
+          <Link
+            href="/"
+            className="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-full border border-wine-rich/10 bg-white/10 backdrop-blur-sm shadow-inner"
+          >
             <span
               className={`text-3xl md:text-4xl font-bold transition-colors duration-300 ${
                 isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
@@ -74,11 +84,14 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
                 </textPath>
               </text>
             </svg>
-          </div>
+          </Link>
         </motion.div>
 
         {/* Title Block */}
-        <div className="text-center space-y-1">
+        <Link
+          href="/"
+          className="text-center space-y-1 block hover:opacity-80 transition-opacity"
+        >
           <h1
             className={`text-2xl md:text-3xl tracking-[0.2em] uppercase font-bold transition-colors duration-150 ${
               isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
@@ -97,16 +110,35 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
               fontFamily: "var(--font-cormorant), serif",
             }}
           >
-            Private Dining
+            Private Cocktail Bar
           </p>
-        </div>
+        </Link>
 
         {/* Navigation - Centered below logo */}
         <nav>
           <ul className="flex flex-wrap justify-center gap-6 md:gap-12">
-            {["The Club", "Membership", "Story", "Dining", "Experience"].map(
-              (item) => (
-                <li key={item}>
+            {[
+              { label: "The Club", href: "/" },
+              { label: "Membership", href: "/membership" },
+              { label: "Story", href: "/story" },
+              { label: "Dining" },
+              { label: "Experience" },
+            ].map((item) => (
+              <li key={item.label}>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${
+                      isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+                    }`}
+                    style={{
+                      fontFamily: "var(--font-cormorant), serif",
+                    }}
+                  >
+                    {item.label}
+                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#C5A572] transition-all duration-300 group-hover:w-full" />
+                  </Link>
+                ) : (
                   <button
                     className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${
                       isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
@@ -115,18 +147,23 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged }: NavbarProps) => {
                       fontFamily: "var(--font-cormorant), serif",
                     }}
                   >
-                    {item}
+                    {item.label}
                     <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#C5A572] transition-all duration-300 group-hover:w-full" />
                   </button>
-                </li>
-              )
-            )}
+                )}
+              </li>
+            ))}
           </ul>
         </nav>
       </div>
 
       {/* Thin Golden Line at the bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-px bg-[#C5A572]/40" />
+      <div
+        className="absolute bottom-0 left-0 w-full h-px bg-[#C5A572]/40"
+        style={{
+          borderRadius: `0 0 ${textRadius}px ${textRadius}px`,
+        }}
+      />
     </motion.header>
   );
 };

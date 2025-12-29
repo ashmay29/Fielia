@@ -8,23 +8,23 @@
   /* deep red */
   --fielia-2: #401312;
   /* darker red-brown */
-  --fielia-3: #671C1C;
+  --fielia-3: #671c1c;
   /* strong crimson */
-  --fielia-4: #0A0A08;
+  --fielia-4: #0a0a08;
   /* near-black */
-  --fielia-5: #2E0506;
+  --fielia-5: #2e0506;
   /* dark oxblood */
-  --fielia-6: #E1D6C7;
+  --fielia-6: #e1d6c7;
   /* warm parchment */
-  --fielia-7: #D8CBBB;
+  --fielia-7: #d8cbbb;
   /* soft parchment */
-  --fielia-8: #861C22;
+  --fielia-8: #861c22;
   /* accent red */
 
   /* MAIN (logo) colors – use sparingly for brand accents */
-  --brand-main: #370D10;
+  --brand-main: #370d10;
   /* primary brand */
-  --brand-contrast: #F7F7F7;
+  --brand-contrast: #f7f7f7;
   /* light contrast */
 }
 
@@ -53,6 +53,32 @@
   --color-champagne: hsl(42, 50%, 50%);
   --color-champagne-muted: hsl(34, 30%, 85%);
   --color-muted-foreground: hsl(350, 30%, 60%);
+
+  /* StarBorder Animations */
+  --animate-star-movement-bottom: star-movement-bottom linear infinite alternate;
+  --animate-star-movement-top: star-movement-top linear infinite alternate;
+
+  @keyframes star-movement-bottom {
+    0% {
+      transform: translate(0%, 0%);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-100%, 0%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes star-movement-top {
+    0% {
+      transform: translate(0%, 0%);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(100%, 0%);
+      opacity: 0;
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -87,9 +113,7 @@ body {
 
 .whispered-text {
   filter: blur(0.3px) contrast(1.05) brightness(0.9);
-  text-shadow:
-    0 0 3px rgba(0, 0, 0, 0.5),
-    0 1px 2px rgba(0, 0, 0, 0.3),
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3),
     0 0 8px rgba(201, 162, 39, 0.1);
   letter-spacing: 0.15em;
 }
@@ -106,15 +130,12 @@ body {
 /* Curtain Reveal Styles */
 .curtain {
   position: absolute;
-  background:
-    radial-gradient(circle at 30% 50%,
+  background: radial-gradient(
+      circle at 30% 50%,
       rgba(255, 255, 255, 0.05),
-      transparent 60%),
-    linear-gradient(90deg,
-      #370d10,
-      #501515 35%,
-      #401312 65%,
-      #2e0506);
+      transparent 60%
+    ),
+    linear-gradient(90deg, #370d10, #501515 35%, #401312 65%, #2e0506);
   background-size: cover;
   will-change: transform;
 }

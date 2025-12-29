@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import StarBorder from "@/components/ui/StarBorder";
 
 export const ReservationForm = () => {
   const [formData, setFormData] = useState({
@@ -171,14 +172,18 @@ export const ReservationForm = () => {
         </div>
 
         <div className="flex justify-center pt-8">
-          <Button
+          <StarBorder
+            as="button"
             type="submit"
             disabled={isSubmitting}
-            variant="secondary"
             className="px-12 py-4 text-sm tracking-[0.2em] min-w-[200px]"
+            color="#E1D6C7"
+            speed="5s"
           >
-            {isSubmitting ? "Sending Request..." : "Request Invitation"}
-          </Button>
+            <span className="text-[#E1D6C7] font-bold uppercase">
+              {isSubmitting ? "Sending..." : "Request Invitation"}
+            </span>
+          </StarBorder>
         </div>
       </form>
 
