@@ -4,6 +4,5 @@
   "devCommand": "pnpm dev",
   "env": {
     "PNPM_HOME": ".pnpm"
-  },
-  "packageManager": "pnpm@10.14.0"
+  }
 }

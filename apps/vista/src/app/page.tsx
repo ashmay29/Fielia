@@ -12,14 +12,34 @@ export default function HomePage() {
   const [showSite, setShowSite] = useState(false);
 
   useEffect(() => {
+    // Check session storage on mount
+    const hasSeenIntro = sessionStorage.getItem("hasSeenIntro");
+    if (hasSeenIntro) {
+      setCurtainDone(true);
+      setShowText(false);
+      setShowSite(true);
+    }
+  }, []);
+
+  useEffect(() => {
     let textTimeout: ReturnType<typeof setTimeout> | undefined;
     let siteTimeout: ReturnType<typeof setTimeout> | undefined;
 
     if (curtainDone) {
-      // Text appears 400ms after curtains
-      textTimeout = setTimeout(() => setShowText(true), 400);
-      // Site appears after text completes (400ms delay + 4800ms animation + 200ms buffer = 5400ms)
-      siteTimeout = setTimeout(() => setShowSite(true), 5400);
+      if (!sessionStorage.getItem("hasSeenIntro")) {
+        // First time visiting: play sequence
+        // Text appears 400ms after curtains
+        textTimeout = setTimeout(() => setShowText(true), 400);
+        // Site appears after text completes (400ms delay + 4800ms animation + 200ms buffer = 5400ms)
+        siteTimeout = setTimeout(() => {
+          setShowSite(true);
+          sessionStorage.setItem("hasSeenIntro", "true");
+        }, 5400);
+      } else {
+        // Already seen: ensure immediate state consistency just in case
+        setShowText(false);
+        setShowSite(true);
+      }
     } else {
       // Reset state if curtainDone becomes false again
       if (showText) setShowText(false);
