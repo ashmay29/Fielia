@@ -12,12 +12,25 @@ export default function HomePage() {
   const [showSite, setShowSite] = useState(false);
 
   useEffect(() => {
+    let textTimeout: ReturnType<typeof setTimeout> | undefined;
+    let siteTimeout: ReturnType<typeof setTimeout> | undefined;
+
     if (curtainDone) {
       // Text appears 400ms after curtains
-      setTimeout(() => setShowText(true), 400);
+      textTimeout = setTimeout(() => setShowText(true), 400);
       // Site appears after text completes (400ms delay + 4800ms animation + 200ms buffer = 5400ms)
-      setTimeout(() => setShowSite(true), 5400);
+      siteTimeout = setTimeout(() => setShowSite(true), 5400);
+    } else {
+      // Reset state if curtainDone becomes false again
+      if (showText) setShowText(false);
+      if (showSite) setShowSite(false);
     }
+
+    return () => {
+      if (textTimeout !== undefined) clearTimeout(textTimeout);
+      if (siteTimeout !== undefined) clearTimeout(siteTimeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [curtainDone]);
 
   return (
@@ -58,7 +71,7 @@ export default function HomePage() {
       )}
 
       {/* Stage 2: "You may enter" Text */}
-      {showText && <EntranceText startDelay={0} onComplete={() => { }} />}
+      {showText && <EntranceText startDelay={0} />}
 
       {/* Stage 3: Main Website */}
       {showSite && <MainWebsite isVisible={showSite} />}
