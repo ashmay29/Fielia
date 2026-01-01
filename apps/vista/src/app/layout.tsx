@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Cormorant_Garamond, Great_Vibes } from "next/font/google";
+import { Playfair_Display, Cormorant_Garamond, Great_Vibes, Monsieur_La_Doulaise, Quintessential } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -20,6 +20,18 @@ const greatVibes = Great_Vibes({
   weight: ["400"],
 });
 
+const monsieurLaDoulaise = Monsieur_La_Doulaise({
+  variable: "--font-monsieur",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+const quintessential = Quintessential({
+  variable: "--font-quintessential",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export const metadata: Metadata = {
   title: "FIELIA — Private Members Club",
   description: "An invite-only bar and supper club in Mumbai",
@@ -33,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${playfair.variable} ${cormorant.variable} ${greatVibes.variable} antialiased`}
+        className={`${playfair.variable} ${cormorant.variable} ${greatVibes.variable} ${monsieurLaDoulaise.variable} ${quintessential.variable} antialiased`}
       >
         {children}
       </body>

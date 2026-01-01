@@ -42,7 +42,7 @@ const masonryItems = [
   },
   {
     id: "6",
-    img: "/F&B/Burnt basque&cacao textures.JPG",
+    img: "/F&B/Brunt basque&cacao textures.JPG",
     url: "",
     height: 450,
   },
@@ -143,7 +143,7 @@ const MembershipPage = () => {
         }}
       />
       {/* Masonry Background Layer - Fixed and masked/blended potentially, or just behind content */}
-      <div className="absolute inset-0 top-68 z-0 opacity-40 pointer-events-none">
+      <div className="absolute inset-0 top-[175px] z-0 opacity-40 pointer-events-none">
         <Masonry
           items={masonryItems}
           ease="power3.out"
@@ -167,94 +167,78 @@ const MembershipPage = () => {
           className="flex-1 w-full max-w-7xl mx-auto px-6 py-24 flex flex-col items-center"
         >
           {/* Header */}
-          <motion.div variants={fadeUp} className="text-center mb-20 max-w-3xl">
+          <motion.div variants={fadeUp} className="text-center mb-20 max-w-3xl px-4">
             <h1
-              className="text-5xl md:text-7xl mb-6"
+              className="text-5xl sm:text-6xl md:text-7xl mb-6 sm:whitespace-nowrap"
               style={{
-                fontFamily: "var(--font-playfair), serif",
-                fontStyle: "italic",
+                fontFamily: "var(--font-quintessential), cursive",
               }}
             >
-              The Fielia Membership
+              Fielia's Cocktail Community
             </h1>
             <p
-              className="text-white/70 text-sm md:text-lg tracking-widest uppercase"
-              style={{ fontFamily: "var(--font-cormorant), serif" }}
+              className="text-white/70 text-4xl sm:text-4xl md:text-5xl lg:text-5xl"
+              style={{ fontFamily: "var(--font-monsieur), cursive" }}
             >
-              Unlock a world of exclusive privileges
+              Unlock a world of exclusive privileges.
             </p>
             <div className="w-24 h-px bg-[#E1D6C7]/30 mx-auto mt-8 mb-12" />
           </motion.div>
 
           {/* Content Container: Side by Side on Desktop */}
-          <div className="flex flex-col lg:flex-row w-full gap-12 lg:gap-20 items-start">
+          <div className="flex flex-col lg:flex-row w-full gap-12 lg:gap-20 items-start mt-16">
             {/* Left Side: Benefits */}
             <div className="flex-1 w-full">
-              <h2
-                className="text-2xl md:text-3xl mb-8 text-center lg:text-left"
-                style={{
-                  fontFamily: "var(--font-playfair), serif",
-                  fontStyle: "italic",
-                }}
-              >
-                Exclusive Privileges
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 py-4 w-full">
-                {benefits.map((b, i) => (
-                  <motion.div
-                    key={i}
-                    variants={fadeUp}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex flex-col items-center lg:items-start text-center lg:text-left group"
-                  >
-                    {/* Decorative Icon Substitute (Diamond/Dot) */}
-                    <div className="w-2 h-2 rotate-45 bg-[#E1D6C7] mb-4 group-hover:bg-[#C5A572] transition-colors" />
-
-                    <h3
-                      className="text-xl mb-2 text-[#E1D6C7]"
-                      style={{ fontFamily: "var(--font-playfair), serif" }}
+              <div className="w-full p-6 sm:p-8 border border-[#E1D6C7]/20 bg-black/40 backdrop-blur-md rounded-sm">
+                <h2
+                  className="text-2xl md:text-3xl mb-8 text-center lg:text-left"
+                  style={{
+                    fontFamily: "var(--font-playfair), serif",
+                    fontStyle: "italic",
+                  }}
+                >
+                  Exclusive Privileges
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 py-4 w-full">
+                  {benefits.map((b, i) => (
+                    <motion.div
+                      key={i}
+                      variants={fadeUp}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex flex-row items-start gap-4 text-left group"
                     >
-                      {b.title}
-                    </h3>
-                    <p
-                      className="text-[#E1D6C7]/60 font-serif leading-relaxed"
-                      style={{
-                        fontFamily: "var(--font-cormorant), serif",
-                        fontSize: "1rem",
-                      }}
-                    >
-                      {b.desc}
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
+                      {/* Decorative Icon Substitute (Diamond/Dot) */}
+                      <div className="w-2 h-2 rotate-45 bg-[#E1D6C7] mt-2 shrink-0 group-hover:bg-[#C5A572] transition-colors" />
 
-              {/* Additional Visuals in Left Column */}
-              <div className="grid grid-cols-2 gap-4 mt-8">
-                <div className="relative h-64 border border-[#E1D6C7]/10 rounded-sm overflow-hidden group">
-                  <Image
-                    src="/interior/DSC02056-Edit.jpg"
-                    fill
-                    alt="Intimate Spaces"
-                    className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
-                  />
+                      <div>
+                        <h3
+                          className="text-xl mb-2 text-[#E1D6C7]"
+                          style={{ fontFamily: "var(--font-playfair), serif" }}
+                        >
+                          {b.title}
+                        </h3>
+                        <p
+                          className="text-[#E1D6C7]/60 font-serif leading-relaxed"
+                          style={{
+                            fontFamily: "var(--font-cormorant), serif",
+                            fontSize: "1rem",
+                          }}
+                        >
+                          {b.desc}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <div className="relative h-64 border border-[#E1D6C7]/10 rounded-sm overflow-hidden group">
-                  <Image
-                    src="/interior/DSC02065-Edit.jpg"
-                    fill
-                    alt="Curated Details"
-                    className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
-                  />
-                </div>
+
               </div>
             </div>
 
             {/* Right Side: Application Form */}
-            <div className="w-full lg:w-[450px] xl:w-[500px] shrink-0 sticky top-32">
+            <div className="w-full lg:w-[450px] xl:w-[500px] shrink-0 lg:sticky lg:top-32">
               <motion.div
                 variants={fadeUp}
                 whileInView="visible"
@@ -326,7 +310,7 @@ const MembershipPage = () => {
                       speed="5s"
                     >
                       <span className="text-[#E1D6C7] uppercase tracking-[0.2em] font-bold text-sm">
-                        Submit Request
+                        Apply for exclusivity
                       </span>
                     </StarBorder>
                   </div>

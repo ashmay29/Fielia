@@ -28,7 +28,7 @@ const Footer = () => {
         {/* Navigation Links */}
         <nav className="mb-8">
           <ul className="flex flex-wrap justify-center gap-6 md:gap-12">
-            {["The Club", "Membership", "Story", "Dining", "Experience"].map(
+            {["The Bar", "Community", "Story", "Dining", "Experience"].map(
               (item) => (
                 <li key={item}>
                   <Link

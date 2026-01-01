@@ -36,56 +36,6 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
       }}
     >
       <div className="flex flex-col items-center justify-center space-y-4">
-        {/* Logo / Crest - Collapses on scroll */}
-        {/* Logo / Crest - Collapses on scroll */}
-        <motion.div
-          initial={false}
-          animate={{
-            height: isLogoHidden ? 0 : 96, // Explicit 96px (h-24) to 0
-            opacity: isLogoHidden ? 0 : 1,
-            marginBottom: isLogoHidden ? 0 : 16,
-            scale: isLogoHidden ? 0.8 : 1,
-          }}
-          transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }} // MATCH EXACTLY
-          className="overflow-hidden flex justify-center"
-        >
-          <Link
-            href="/"
-            className="relative w-20 h-20 md:w-24 md:h-24 flex items-center justify-center rounded-full border border-wine-rich/10 bg-white/10 backdrop-blur-sm shadow-inner"
-          >
-            <span
-              className={`text-3xl md:text-4xl font-bold transition-colors duration-300 ${
-                isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-              }`}
-              style={{
-                fontFamily: "var(--font-great-vibes), cursive",
-              }}
-            >
-              F
-            </span>
-            <svg
-              className="absolute inset-0 w-full h-full rotate-30 opacity-30"
-              viewBox="0 0 100 100"
-            >
-              <path
-                id="curve"
-                d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
-                fill="transparent"
-              />
-              <text width="500">
-                <textPath
-                  xlinkHref="#curve"
-                  className="text-[10px] uppercase tracking-[0.3em] font-medium"
-                  fill="hsl(350 50% 20%)" // Dark wine for the ring text
-                  startOffset="50%"
-                  textAnchor="middle"
-                >
-                  Est. 1923
-                </textPath>
-              </text>
-            </svg>
-          </Link>
-        </motion.div>
 
         {/* Title Block */}
         <Link
@@ -93,9 +43,8 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
           className="text-center space-y-1 block hover:opacity-80 transition-opacity"
         >
           <h1
-            className={`text-2xl md:text-3xl tracking-[0.2em] uppercase font-bold transition-colors duration-150 ${
-              isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-            }`}
+            className={`text-2xl md:text-3xl tracking-[0.2em] uppercase font-bold transition-colors duration-150 ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+              }`}
             style={{
               fontFamily: "var(--font-cormorant), serif",
             }}
@@ -103,9 +52,8 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
             Fielia
           </h1>
           <p
-            className={`text-[10px] tracking-[0.4em] uppercase font-bold transition-colors duration-150 ${
-              isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-            }`}
+            className={`text-[10px] tracking-[0.4em] uppercase font-bold transition-colors duration-150 ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+              }`}
             style={{
               fontFamily: "var(--font-cormorant), serif",
             }}
@@ -118,8 +66,8 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
         <nav>
           <ul className="flex flex-wrap justify-center gap-6 md:gap-12">
             {[
-              { label: "The Club", href: "/" },
-              { label: "Membership", href: "/membership" },
+              { label: "The Bar", href: "/" },
+              { label: "Community", href: "/membership" },
               { label: "Story", href: "/story" },
               { label: "Dining" },
               { label: "Experience" },
@@ -128,9 +76,8 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
                 {item.href ? (
                   <Link
                     href={item.href}
-                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${
-                      isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-                    }`}
+                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+                      }`}
                     style={{
                       fontFamily: "var(--font-cormorant), serif",
                     }}
@@ -140,9 +87,8 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
                   </Link>
                 ) : (
                   <button
-                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${
-                      isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-                    }`}
+                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+                      }`}
                     style={{
                       fontFamily: "var(--font-cormorant), serif",
                     }}

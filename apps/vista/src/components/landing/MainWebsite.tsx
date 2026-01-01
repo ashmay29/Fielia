@@ -144,36 +144,39 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-black/60" />
           </div>
 
           {/* Hero visual - Pure typography on background */}
           <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-12 pb-10 flex flex-col items-center justify-center text-center min-h-[70vh] sm:min-h-[75vh] md:min-h-[85vh]">
 
             <p
-              className="text-[#E1D6C7] text-[0.65rem] sm:text-xs md:text-sm tracking-[0.3em] uppercase mb-4 sm:mb-6 px-4"
+              className="text-[#E1D6C7] text-[0.65rem] sm:text-md md:text-lg lg:text-xl tracking-[0.3em] uppercase mb-4 sm:mb-6 px-4"
               style={{ fontFamily: "var(--font-cormorant), serif" }}
             >
-              Curtains Rise. Fielia Begins.
+              Mumbai's First
             </p>
             <h2
-              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl text-[#E1D6C7] opacity-90 mb-5 sm:mb-7 leading-tight px-4"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-[#E1D6C7] opacity-90 mb-5 sm:mb-7 leading-tight px-4"
               style={{
-                fontFamily: "var(--font-playfair), serif",
-                fontStyle: "italic",
+                fontFamily: "var(--font-quintessential), cursive",
                 textShadow: "0 4px 20px rgba(0,0,0,0.5)",
               }}
             >
-              Fielia Private Bar
+              Cocktail Cinema Bar & Supper Theatre
             </h2>
 
             {/* Mobile-only supporting line removed as requested */}
 
             {/* Invitation copy above CTA */}
             <p
-              className="text-[#E1D6C7]/90 text-sm sm:text-base italic font-serif mb-4 sm:mb-5 px-2"
+              className="text-[#E1D6C7]/90 text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-5 px-2"
+              style={{
+                fontFamily: "var(--font-monsieur), cursive",
+                fontWeight: 400,
+              }}
             >
-              Enter the hush—where excellence lingers in every pour.
+              by invitation only
             </p>
 
             {/* Primary CTA */}
@@ -188,7 +191,7 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
                 className="relative text-[#E1D6C7] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-xs sm:text-sm font-semibold transition-colors duration-300 group-hover:text-white px-6 sm:px-0"
                 style={{ fontFamily: "var(--font-cormorant), serif" }}
               >
-                Apply for Membership
+                Join the Fielia Community
               </span>
             </StarBorder>
 
@@ -234,8 +237,8 @@ const MainWebsite = ({ isVisible }: MainWebsiteProps) => {
               {/* Mobile-first copy stack pinned to bottom in a framed card */}
               <div
                 className={`absolute inset-x-0 bottom-0 md:hidden flex pb-5 ${panel.align === "right"
-                    ? "justify-end pr-4 sm:pr-6"
-                    : "justify-start pl-4 sm:pl-6"
+                  ? "justify-end pr-4 sm:pr-6"
+                  : "justify-start pl-4 sm:pl-6"
                   }`}
               >
                 <div
