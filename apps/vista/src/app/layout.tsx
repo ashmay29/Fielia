@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Cormorant_Garamond, Great_Vibes, Monsieur_La_Doulaise, Quintessential } from "next/font/google";
+import {
+  Playfair_Display,
+  Cormorant_Garamond,
+  Great_Vibes,
+  Monsieur_La_Doulaise,
+  Quintessential,
+} from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -35,6 +41,10 @@ const quintessential = Quintessential({
 export const metadata: Metadata = {
   title: "FIELIA — Private Members Club",
   description: "An invite-only bar and supper club in Mumbai",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

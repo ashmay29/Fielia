@@ -2,6 +2,7 @@
 
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface NavbarProps {
   variants?: Variants;
@@ -10,7 +11,14 @@ interface NavbarProps {
   textRadius?: number;
 }
 
-const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: NavbarProps) => {
+const Navbar = ({
+  variants,
+  isLogoHidden,
+  isColorChanged,
+  textRadius = 12,
+}: NavbarProps) => {
+  const pathname = usePathname();
+
   return (
     <motion.header
       className="sticky top-0 left-0 w-full z-50 border-b"
@@ -36,15 +44,15 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
       }}
     >
       <div className="flex flex-col items-center justify-center space-y-4">
-
         {/* Title Block */}
         <Link
           href="/"
           className="text-center space-y-1 block hover:opacity-80 transition-opacity"
         >
           <h1
-            className={`text-2xl md:text-3xl tracking-[0.2em] uppercase font-bold transition-colors duration-150 ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-              }`}
+            className={`text-2xl md:text-3xl tracking-[0.2em] uppercase font-bold transition-colors duration-150 ${
+              isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+            }`}
             style={{
               fontFamily: "var(--font-cormorant), serif",
             }}
@@ -52,8 +60,9 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
             Fielia
           </h1>
           <p
-            className={`text-[10px] tracking-[0.4em] uppercase font-bold transition-colors duration-150 ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-              }`}
+            className={`text-[10px] tracking-[0.4em] uppercase font-bold transition-colors duration-150 ${
+              isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+            }`}
             style={{
               fontFamily: "var(--font-cormorant), serif",
             }}
@@ -76,19 +85,37 @@ const Navbar = ({ variants, isLogoHidden, isColorChanged, textRadius = 12 }: Nav
                 {item.href ? (
                   <Link
                     href={item.href}
-                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-                      }`}
+                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 ${
+                      pathname === item.href
+                        ? isColorChanged
+                          ? "text-[#370D10]" // Active page - dark text on light background
+                          : "text-[#C5A572]" // Active page - golden text on dark background
+                        : isColorChanged
+                        ? "text-[#370D10] hover:text-[#C5A572]"
+                        : "text-[#E1D6C7] hover:text-[#C5A572]"
+                    }`}
                     style={{
                       fontFamily: "var(--font-cormorant), serif",
                     }}
                   >
                     {item.label}
-                    <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#C5A572] transition-all duration-300 group-hover:w-full" />
+                    <span
+                      className={`absolute -bottom-1 left-0 h-px transition-all duration-300 ${
+                        pathname === item.href
+                          ? `w-full ${
+                              isColorChanged ? "bg-[#370D10]" : "bg-[#C5A572]"
+                            }` // Active page has full underline with adaptive color
+                          : `w-0 group-hover:w-full ${
+                              isColorChanged ? "bg-[#370D10]" : "bg-[#C5A572]"
+                            }` // Hover effect with adaptive color
+                      }`}
+                    />
                   </Link>
                 ) : (
                   <button
-                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
-                      }`}
+                    className={`text-[10px] md:text-xs uppercase tracking-widest relative group font-bold transition-all duration-150 hover:scale-105 hover:text-[#C5A572] ${
+                      isColorChanged ? "text-[#370D10]" : "text-[#E1D6C7]"
+                    }`}
                     style={{
                       fontFamily: "var(--font-cormorant), serif",
                     }}

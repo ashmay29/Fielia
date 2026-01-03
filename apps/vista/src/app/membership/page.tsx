@@ -6,7 +6,7 @@ import Footer from "@/components/landing/Footer";
 import { useState, useRef, useCallback } from "react";
 import StarBorder from "@/components/ui/StarBorder";
 import Masonry from "@/components/ui/Masonry";
-import Image from "next/image";
+import { createMembershipApplication } from "./actions";
 
 // Sample data for Masonry
 const masonryItems = [
@@ -67,6 +67,18 @@ const MembershipPage = () => {
   const [isColorChanged, setIsColorChanged] = useState(false);
   const ticking = useRef(false);
 
+  // Form state
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    reason: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
   // Moved items outside
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
@@ -80,6 +92,40 @@ const MembershipPage = () => {
       ticking.current = true;
     }
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    setErrorMessage("");
+
+    try {
+      const response = await createMembershipApplication(formData);
+
+      if (response.success) {
+        setSubmitStatus("success");
+        // Reset form
+        setFormData({
+          fullName: "",
+          email: "",
+          reason: "",
+        });
+        // Reset success message after 5 seconds
+        setTimeout(() => {
+          setSubmitStatus("idle");
+        }, 5000);
+      } else {
+        setSubmitStatus("error");
+        setErrorMessage(response.error || "Failed to submit application");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      setSubmitStatus("error");
+      setErrorMessage("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const benefits = [
     {
@@ -167,14 +213,17 @@ const MembershipPage = () => {
           className="flex-1 w-full max-w-7xl mx-auto px-6 py-24 flex flex-col items-center"
         >
           {/* Header */}
-          <motion.div variants={fadeUp} className="text-center mb-20 max-w-3xl px-4">
+          <motion.div
+            variants={fadeUp}
+            className="text-center mb-20 max-w-3xl px-4"
+          >
             <h1
               className="text-5xl sm:text-6xl md:text-7xl mb-6 sm:whitespace-nowrap"
               style={{
                 fontFamily: "var(--font-quintessential), cursive",
               }}
             >
-              Fielia's Cocktail Community
+              Fielia&apos;s Cocktail Community
             </h1>
             <p
               className="text-white/70 text-4xl sm:text-4xl md:text-5xl lg:text-5xl"
@@ -233,7 +282,6 @@ const MembershipPage = () => {
                     </motion.div>
                   ))}
                 </div>
-
               </div>
             </div>
 
@@ -257,47 +305,80 @@ const MembershipPage = () => {
                   </p>
                 </div>
 
-                <form
-                  className="space-y-6"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    // TODO: Implement form submission logic
-                  }}
-                >
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  {submitStatus === "success" && (
+                    <div className="bg-green-900/20 border border-green-500/30 text-green-400 px-4 py-3 rounded text-sm">
+                      Thank you! Your application has been submitted
+                      successfully.
+                    </div>
+                  )}
+
+                  {submitStatus === "error" && (
+                    <div className="bg-red-900/20 border border-red-500/30 text-red-400 px-4 py-3 rounded text-sm">
+                      {errorMessage}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label htmlFor="fullName" className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
+                      <label
+                        htmlFor="fullName"
+                        className="text-xs uppercase tracking-widest text-[#E1D6C7]/70"
+                      >
                         Full Name
                       </label>
                       <input
                         id="fullName"
                         type="text"
-                        className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors"
+                        required
+                        disabled={isSubmitting}
+                        className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors disabled:opacity-50"
                         placeholder="Jane Doe"
+                        value={formData.fullName}
+                        onChange={(e) =>
+                          setFormData({ ...formData, fullName: e.target.value })
+                        }
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label htmlFor="email" className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
+                      <label
+                        htmlFor="email"
+                        className="text-xs uppercase tracking-widest text-[#E1D6C7]/70"
+                      >
                         Email Address
                       </label>
                       <input
                         id="email"
                         type="email"
-                        className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors"
+                        required
+                        disabled={isSubmitting}
+                        className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors disabled:opacity-50"
                         placeholder="jane@example.com"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 pt-4">
-                    <label htmlFor="reason" className="text-xs uppercase tracking-widest text-[#E1D6C7]/70">
+                    <label
+                      htmlFor="reason"
+                      className="text-xs uppercase tracking-widest text-[#E1D6C7]/70"
+                    >
                       Reason for Interest
                     </label>
                     <textarea
                       id="reason"
                       rows={3}
-                      className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors resize-none"
+                      required
+                      disabled={isSubmitting}
+                      className="bg-transparent border-b border-[#E1D6C7]/30 py-2 focus:outline-none focus:border-[#E1D6C7] text-[#E1D6C7] transition-colors resize-none disabled:opacity-50"
                       placeholder="Tell us a bit about yourself..."
+                      value={formData.reason}
+                      onChange={(e) =>
+                        setFormData({ ...formData, reason: e.target.value })
+                      }
                     />
                   </div>
 
@@ -308,9 +389,12 @@ const MembershipPage = () => {
                       className="custom-class"
                       color="#E1D6C7"
                       speed="5s"
+                      disabled={isSubmitting}
                     >
                       <span className="text-[#E1D6C7] uppercase tracking-[0.2em] font-bold text-sm">
-                        Apply for exclusivity
+                        {isSubmitting
+                          ? "Submitting..."
+                          : "Apply for exclusivity"}
                       </span>
                     </StarBorder>
                   </div>
