@@ -2,6 +2,7 @@
 
 import dbConnect from '@/lib/db';
 import Card, { ICard } from '@/models/Card';
+import { getSession } from '@/lib/auth';
 
 export type CardData = {
   uuid: string;
@@ -11,6 +12,7 @@ export type CardData = {
   address: string;
   preference: string;
   content?: string;
+  createdAt?: string;
 };
 
 export type CardResponse = {
@@ -19,7 +21,18 @@ export type CardResponse = {
   error?: string;
 };
 
+export type AllCardsResponse = {
+  success: boolean;
+  data?: CardData[];
+  error?: string;
+};
+
 export async function getCardByUuid(uuid: string): Promise<CardResponse> {
+  const session = await getSession();
+  if (!session) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
   if (!uuid) {
     return { success: false, error: 'UUID is required' };
   }
@@ -43,6 +56,7 @@ export async function getCardByUuid(uuid: string): Promise<CardResponse> {
         address: card.address,
         preference: card.preference,
         content: card.content,
+        createdAt: card.createdAt?.toISOString(),
       },
     };
   } catch (error) {
@@ -52,6 +66,11 @@ export async function getCardByUuid(uuid: string): Promise<CardResponse> {
 }
 
 export async function createCard(data: CardData): Promise<CardResponse> {
+  const session = await getSession();
+  if (!session) {
+    return { success: false, error: 'Unauthorized' };
+  }
+
   if (!data.uuid || !data.firstName || !data.lastName) {
     return { success: false, error: 'Missing required fields' };
   }
@@ -79,7 +98,8 @@ export async function createCard(data: CardData): Promise<CardResponse> {
           phone: newCard.phone,
           address: newCard.address,
           preference: newCard.preference,
-          content: newCard.content
+          content: newCard.content,
+          createdAt: newCard.createdAt?.toISOString()
       }
     };
   } catch (error) {
@@ -89,6 +109,11 @@ export async function createCard(data: CardData): Promise<CardResponse> {
 }
 
 export async function updateCard(data: CardData): Promise<CardResponse> {
+    const session = await getSession();
+    if (!session) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
     if (!data.uuid) {
         return { success: false, error: 'UUID is required' };
     }
@@ -118,7 +143,8 @@ export async function updateCard(data: CardData): Promise<CardResponse> {
                 phone: updatedCard.phone,
                 address: updatedCard.address,
                 preference: updatedCard.preference,
-                content: updatedCard.content
+                content: updatedCard.content,
+                createdAt: updatedCard.createdAt?.toISOString()
             }
         };
 
@@ -126,4 +152,36 @@ export async function updateCard(data: CardData): Promise<CardResponse> {
         console.error('Error updating card:', error);
         return { success: false, error: 'Failed to update card' };
     }
+}
+
+export async function getAllCards(): Promise<AllCardsResponse> {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    await dbConnect();
+    
+    const cards = await Card.find({})
+      .sort({ createdAt: -1 })
+      .lean() as unknown as ICard[];
+
+    return {
+      success: true,
+      data: cards.map(card => ({
+        uuid: card.uuid,
+        firstName: card.firstName,
+        lastName: card.lastName,
+        phone: card.phone,
+        address: card.address,
+        preference: card.preference,
+        content: card.content,
+        createdAt: card.createdAt?.toISOString(),
+      })),
+    };
+  } catch (error) {
+    console.error('Error fetching cards:', error);
+    return { success: false, error: 'Failed to fetch cards' };
+  }
 }

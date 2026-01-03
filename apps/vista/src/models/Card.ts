@@ -8,6 +8,8 @@ export interface ICard extends Document {
   address: string;
   preference: string;
   content?: string; // Kept for backward compatibility or generic use
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const CardSchema: Schema = new Schema({
