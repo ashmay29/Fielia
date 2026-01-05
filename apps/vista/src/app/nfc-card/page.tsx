@@ -656,7 +656,6 @@ export default function NfcCardPage() {
                       Phone Number
                     </label>
                     <input
-                      required
                       type="tel"
                       className="w-full bg-[rgba(255,255,255,0.05)] border border-[var(--color-primary-strong)] rounded p-2 text-[var(--color-surface)] focus:border-[var(--color-accent)] outline-none transition-colors"
                       value={formData.phone}
@@ -671,7 +670,6 @@ export default function NfcCardPage() {
                       Address
                     </label>
                     <input
-                      required
                       type="text"
                       className="w-full bg-[rgba(255,255,255,0.05)] border border-[var(--color-primary-strong)] rounded p-2 text-[var(--color-surface)] focus:border-[var(--color-accent)] outline-none transition-colors"
                       value={formData.address}
@@ -686,7 +684,6 @@ export default function NfcCardPage() {
                       Preference
                     </label>
                     <textarea
-                      required
                       rows={2}
                       className="w-full bg-[rgba(255,255,255,0.05)] border border-[var(--color-primary-strong)] rounded p-2 text-[var(--color-surface)] focus:border-[var(--color-accent)] outline-none transition-colors"
                       value={formData.preference}
