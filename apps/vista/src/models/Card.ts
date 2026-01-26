@@ -8,6 +8,7 @@ export interface ICard extends Document {
   address: string;
   preference: string;
   content?: string; // Kept for backward compatibility or generic use
+  scanHistory: { timestamp: Date }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,6 +46,14 @@ const CardSchema: Schema = new Schema(
       type: String,
       required: false,
     },
+    scanHistory: [
+      {
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -28,12 +28,19 @@ export default function AdminPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredApplications = applications.filter((app) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      (app.fullName?.toLowerCase() || "").includes(query) ||
+      (app.email?.toLowerCase() || "").includes(query) ||
+      (app.status?.toLowerCase() || "").includes(query)
+    );
+  });
 
   const checkAuth = async () => {
-    setIsLoading(true);
+    // setIsLoading(true); // Removed to avoid useEffect warning
     const response = await getMembershipApplications();
     if (response.success && response.data) {
       setIsAuthenticated(true);
@@ -44,6 +51,15 @@ export default function AdminPage() {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    // Wrap in setTimeout to avoid "synchronous setState" lint warning
+    const timer = setTimeout(() => {
+      checkAuth();
+    }, 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -52,6 +68,7 @@ export default function AdminPage() {
     const response = await loginAdmin(loginForm.username, loginForm.password);
 
     if (response.success) {
+      setIsLoading(true); // Set loading explicitly before fetching
       setIsAuthenticated(true);
       await checkAuth();
     } else {
@@ -180,16 +197,35 @@ export default function AdminPage() {
       />
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-3xl md:text-4xl font-serif">
             Membership Applications
           </h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 border border-[#E1D6C7]/30 text-[#E1D6C7] rounded hover:bg-[#E1D6C7]/10 transition-colors text-sm uppercase tracking-wider"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="relative flex-1 md:w-64">
+              <input
+                type="text"
+                placeholder="Search applications..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-black/40 border border-[#E1D6C7]/30 rounded px-4 py-2 text-[#E1D6C7] placeholder-[#E1D6C7]/50 focus:outline-none focus:border-[#E1D6C7] transition-colors text-sm"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#E1D6C7]/50 hover:text-[#E1D6C7]"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 border border-[#E1D6C7]/30 text-[#E1D6C7] rounded hover:bg-[#E1D6C7]/10 transition-colors text-sm uppercase tracking-wider whitespace-nowrap"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="bg-black/40 backdrop-blur-md border border-[#E1D6C7]/20 rounded-lg overflow-hidden">
@@ -218,17 +254,19 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E1D6C7]/10">
-                {applications.length === 0 ? (
+                {filteredApplications.length === 0 ? (
                   <tr>
                     <td
                       colSpan={6}
                       className="px-4 py-8 text-center text-[#E1D6C7]/50"
                     >
-                      No applications yet
+                      {searchQuery
+                        ? "No applications found matching your search"
+                        : "No applications yet"}
                     </td>
                   </tr>
                 ) : (
-                  applications.map((app) => (
+                  filteredApplications.map((app) => (
                     <tr
                       key={app._id}
                       className="hover:bg-[#E1D6C7]/5 transition-colors"

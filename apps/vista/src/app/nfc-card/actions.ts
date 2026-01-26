@@ -13,6 +13,7 @@ export type CardData = {
   preference: string;
   content?: string;
   createdAt?: string;
+  scanHistory?: { timestamp: Date }[];
 };
 
 export type CardResponse = {
@@ -39,8 +40,16 @@ export async function getCardByUuid(uuid: string): Promise<CardResponse> {
 
   try {
     await dbConnect();
-    // Using lean() for better performance
-    const card = await Card.findOne({ uuid }).lean() as unknown as ICard;
+    // Using findOneAndUpdate to atomically update history and return document
+    const card = (await Card.findOneAndUpdate(
+      { uuid },
+      {
+        $push: {
+          scanHistory: { timestamp: new Date() },
+        },
+      },
+      { new: true }
+    ).lean()) as unknown as ICard;
 
     if (!card) {
       return { success: false, error: 'Card not found' };
@@ -57,6 +66,7 @@ export async function getCardByUuid(uuid: string): Promise<CardResponse> {
         preference: card.preference,
         content: card.content,
         createdAt: card.createdAt?.toISOString(),
+        scanHistory: card.scanHistory,
       },
     };
   } catch (error) {
@@ -99,7 +109,8 @@ export async function createCard(data: CardData): Promise<CardResponse> {
           address: newCard.address,
           preference: newCard.preference,
           content: newCard.content,
-          createdAt: newCard.createdAt?.toISOString()
+          createdAt: newCard.createdAt?.toISOString(),
+          scanHistory: newCard.scanHistory
       }
     };
   } catch (error) {
@@ -144,7 +155,8 @@ export async function updateCard(data: CardData): Promise<CardResponse> {
                 address: updatedCard.address,
                 preference: updatedCard.preference,
                 content: updatedCard.content,
-                createdAt: updatedCard.createdAt?.toISOString()
+                createdAt: updatedCard.createdAt?.toISOString(),
+                scanHistory: updatedCard.scanHistory
             }
         };
 
@@ -178,6 +190,7 @@ export async function getAllCards(): Promise<AllCardsResponse> {
         preference: card.preference,
         content: card.content,
         createdAt: card.createdAt?.toISOString(),
+        scanHistory: card.scanHistory,
       })),
     };
   } catch (error) {

@@ -36,6 +36,7 @@ export default function NfcCardPage() {
     phone: "",
     address: "",
     preference: "",
+    content: "",
   });
 
   // Timeout to clear buffer if typing stops (prevents random keystrokes from accumulating)
@@ -102,6 +103,20 @@ export default function NfcCardPage() {
     });
   };
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCards = allCards.filter((card) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      card.firstName.toLowerCase().includes(query) ||
+      card.lastName.toLowerCase().includes(query) ||
+      card.phone.toLowerCase().includes(query) ||
+      card.address.toLowerCase().includes(query) ||
+      card.preference.toLowerCase().includes(query) ||
+      card.uuid.toLowerCase().includes(query)
+    );
+  });
+
   // Toggle User List View
   useEffect(() => {
     if (isAuthenticated && showUserList) {
@@ -114,6 +129,8 @@ export default function NfcCardPage() {
       loadCards();
     }
   }, [isAuthenticated, showUserList]);
+
+  // ... (keeping existing fetchCard and other handlers same) ...
 
   const fetchCard = useCallback(async (uuid: string) => {
     // Prevent fetching if not authenticated (though backend will block it too)
@@ -260,7 +277,7 @@ export default function NfcCardPage() {
     };
   }, [status, fetchCard, isAuthenticated, showUserList]);
 
-  // Loading State
+  // isAuthLoading, not Authenticated checks...
   if (isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#1a0505] flex items-center justify-center">
@@ -365,6 +382,13 @@ export default function NfcCardPage() {
           <h1 className="text-lg font-serif text-[#E1D6C7]">NFC Manager</h1>
         </div>
         <div className="flex gap-3">
+          <a
+            href="/live-scans"
+            target="_blank"
+            className="px-4 py-2 border border-[#E1D6C7]/30 text-[#E1D6C7] rounded hover:bg-[#E1D6C7]/10 transition-colors text-xs uppercase tracking-wider flex items-center"
+          >
+            Live Scans
+          </a>
           <button
             onClick={() => setShowUserList(!showUserList)}
             className={`px-4 py-2 border rounded text-xs uppercase tracking-wider transition-colors ${
@@ -387,6 +411,28 @@ export default function NfcCardPage() {
       {showUserList ? (
         /* User List View */
         <div className="relative z-10 w-full max-w-7xl mx-auto p-4 md:p-8 overflow-auto">
+          <div className="mb-6 flex justify-between items-center">
+            <h2 className="text-2xl font-serif text-[#E1D6C7]">
+              Enrolled Users
+            </h2>
+            <div className="relative w-64">
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-black/40 border border-[#E1D6C7]/30 rounded px-4 py-2 text-[#E1D6C7] placeholder-[#E1D6C7]/50 focus:outline-none focus:border-[#E1D6C7] transition-colors text-sm"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#E1D6C7]/50 hover:text-[#E1D6C7]"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
           <div className="bg-black/40 backdrop-blur-md border border-[#E1D6C7]/20 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -405,6 +451,9 @@ export default function NfcCardPage() {
                       Preference
                     </th>
                     <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
+                      Visits
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
                       Enrolled
                     </th>
                     <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
@@ -413,20 +462,38 @@ export default function NfcCardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E1D6C7]/10">
-                  {allCards.length === 0 ? (
+                  {filteredCards.length === 0 ? (
                     <tr>
                       <td
                         colSpan={6}
                         className="px-4 py-8 text-center text-[#E1D6C7]/50"
                       >
-                        No users enrolled yet
+                        {searchQuery
+                          ? "No users found matching your search"
+                          : "No users enrolled yet"}
                       </td>
                     </tr>
                   ) : (
-                    allCards.map((card) => (
+                    filteredCards.map((card) => (
                       <tr
                         key={card.uuid}
-                        className="hover:bg-[#E1D6C7]/5 transition-colors"
+                        onClick={() => {
+                          console.log("Row clicked", card.uuid);
+                          setFormData({
+                            firstName: card.firstName,
+                            lastName: card.lastName,
+                            phone: card.phone || "",
+                            address: card.address || "",
+                            preference: card.preference || "",
+                            content: card.content || "",
+                          });
+                          setScannedUuid(card.uuid);
+                          setCardData(card);
+                          setStatus("EDITING");
+                          setShowUserList(false); // Hide list to show form
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className="hover:bg-[#E1D6C7]/5 transition-colors cursor-pointer"
                       >
                         <td className="px-4 py-4 font-medium">
                           {card.firstName} {card.lastName}
@@ -443,6 +510,9 @@ export default function NfcCardPage() {
                           title={card.preference}
                         >
                           {card.preference}
+                        </td>
+                        <td className="px-4 py-4 text-sm text-[#E1D6C7]/70">
+                          {card.scanHistory?.length || 0}
                         </td>
                         <td className="px-4 py-4 text-sm text-[#E1D6C7]/70">
                           {formatDate(card.createdAt)}
@@ -617,6 +687,58 @@ export default function NfcCardPage() {
                   onSubmit={handleRegisterOrUpdate}
                   className="space-y-4 text-left"
                 >
+                  <div className="bg-[#1a0505] p-3 rounded border border-[var(--color-surface-muted)]/20">
+                    <span className="block text-xs uppercase tracking-widest text-[var(--color-surface-muted)] mb-1">
+                      Preference
+                    </span>
+                    <span className="text-[var(--color-surface)] text-sm">
+                      {cardData?.preference || "None"}
+                    </span>
+                  </div>
+
+                  <div className="bg-[#1a0505] p-3 rounded border border-[var(--color-surface-muted)]/20">
+                    <span className="block text-xs uppercase tracking-widest text-[var(--color-surface-muted)] mb-1">
+                      Total Visits
+                    </span>
+                    <span className="text-[var(--color-surface)] text-sm">
+                      {cardData?.scanHistory?.length || 0}
+                    </span>
+                  </div>
+
+                  {cardData?.scanHistory && cardData.scanHistory.length > 0 && (
+                    <div className="bg-[#1a0505] p-3 rounded border border-[var(--color-surface-muted)]/20">
+                      <span className="block text-xs uppercase tracking-widest text-[var(--color-surface-muted)] mb-2">
+                        Visit History
+                      </span>
+                      <div className="max-h-32 overflow-y-auto pr-2 space-y-1">
+                        {[...cardData.scanHistory]
+                          .sort(
+                            (a, b) =>
+                              new Date(b.timestamp).getTime() -
+                              new Date(a.timestamp).getTime()
+                          )
+                          .map((visit, index) => (
+                            <div
+                              key={index}
+                              className="text-[var(--color-surface)] text-xs flex justify-between border-b border-[var(--color-surface-muted)]/10 pb-1 last:border-0"
+                            >
+                              <span>
+                                {new Date(visit.timestamp).toLocaleDateString()}
+                              </span>
+                              <span className="text-[var(--color-surface-muted)]">
+                                {new Date(visit.timestamp).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
+                              </span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs uppercase tracking-widest text-[var(--color-surface-muted)] mb-1">
