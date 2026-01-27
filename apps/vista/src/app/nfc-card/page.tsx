@@ -160,6 +160,7 @@ export default function NfcCardPage() {
         phone: cardData.phone,
         address: cardData.address,
         preference: cardData.preference,
+        content: cardData.content || "",
       });
       setStatus("EDITING");
     }
@@ -194,6 +195,7 @@ export default function NfcCardPage() {
           phone: "",
           address: "",
           preference: "",
+          content: "",
         });
       } else {
         alert(
