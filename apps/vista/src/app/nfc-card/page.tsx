@@ -5,6 +5,7 @@ import {
   getCardByUuid,
   createCard,
   updateCard,
+  deleteCard,
   getAllCards,
   CardData,
 } from "./actions";
@@ -37,6 +38,8 @@ export default function NfcCardPage() {
     address: "",
     preference: "",
     content: "",
+    dob: "",
+    anniversary: "",
   });
 
   // Timeout to clear buffer if typing stops (prevents random keystrokes from accumulating)
@@ -152,6 +155,44 @@ export default function NfcCardPage() {
     }
   }, []);
 
+  const handleDelete = async (uuid: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent row click
+    if (
+      !globalThis.confirm(
+        "Are you sure you want to delete this user? This cannot be undone.",
+      )
+    )
+      return;
+
+    const response = await deleteCard(uuid);
+    if (response.success) {
+      // Refresh list
+      const listResponse = await getAllCards();
+      if (listResponse.success && listResponse.data) {
+        setAllCards(listResponse.data);
+      }
+    } else {
+      alert(response.error || "Failed to delete user");
+    }
+  };
+
+  const handleManualAdd = () => {
+    setCardData(null);
+    setScannedUuid("");
+    setFormData({
+      firstName: "",
+      lastName: "",
+      phone: "",
+      address: "",
+      preference: "",
+      content: "",
+      dob: "",
+      anniversary: "",
+    });
+    setStatus("NOT_FOUND");
+    setShowUserList(false);
+  };
+
   const handleEditMode = () => {
     if (cardData) {
       setFormData({
@@ -160,6 +201,9 @@ export default function NfcCardPage() {
         phone: cardData.phone,
         address: cardData.address,
         preference: cardData.preference,
+        content: cardData.content || "",
+        dob: cardData.dob || "",
+        anniversary: cardData.anniversary || "",
       });
       setStatus("EDITING");
     }
@@ -194,11 +238,14 @@ export default function NfcCardPage() {
           phone: "",
           address: "",
           preference: "",
+          content: "",
+          dob: "",
+          anniversary: "",
         });
       } else {
         alert(
           response.error ||
-            `Failed to ${isEditing ? "update" : "register"} card`
+            `Failed to ${isEditing ? "update" : "register"} card`,
         );
         if (!isEditing) setStatus("NOT_FOUND");
         else setStatus("EDITING"); // If editing, stay on editing to fix errors.
@@ -390,6 +437,12 @@ export default function NfcCardPage() {
             Live Scans
           </a>
           <button
+            onClick={handleManualAdd}
+            className="px-4 py-2 border border-[#E1D6C7]/30 text-[#E1D6C7] rounded hover:bg-[#E1D6C7]/10 transition-colors text-xs uppercase tracking-wider flex items-center"
+          >
+            Add User
+          </button>
+          <button
             onClick={() => setShowUserList(!showUserList)}
             className={`px-4 py-2 border rounded text-xs uppercase tracking-wider transition-colors ${
               showUserList
@@ -459,13 +512,16 @@ export default function NfcCardPage() {
                     <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
                       UUID
                     </th>
+                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E1D6C7]/10">
                   {filteredCards.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={7}
                         className="px-4 py-8 text-center text-[#E1D6C7]/50"
                       >
                         {searchQuery
@@ -486,6 +542,8 @@ export default function NfcCardPage() {
                             address: card.address || "",
                             preference: card.preference || "",
                             content: card.content || "",
+                            dob: card.dob || "",
+                            anniversary: card.anniversary || "",
                           });
                           setScannedUuid(card.uuid);
                           setCardData(card);
@@ -520,6 +578,14 @@ export default function NfcCardPage() {
                         <td className="px-4 py-4 text-xs font-mono text-[#E1D6C7]/50">
                           {card.uuid}
                         </td>
+                        <td className="px-4 py-4 text-sm">
+                          <button
+                            onClick={(e) => handleDelete(card.uuid, e)}
+                            className="text-red-400 hover:text-red-300 hover:underline text-xs uppercase tracking-wider"
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -550,7 +616,7 @@ export default function NfcCardPage() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={1.5}
-                      d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.575-4.133"
+                      d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.575-4.133"
                     />
                   </svg>
                 </div>
@@ -634,6 +700,28 @@ export default function NfcCardPage() {
                       {cardData.address}
                     </p>
                   </div>
+
+                  {cardData.dob && (
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-[0.2em] text-[var(--color-surface-muted)] mb-1 opacity-70">
+                        Date of Birth
+                      </label>
+                      <p className="text-lg text-[var(--color-surface)] font-light tracking-wide">
+                        {new Date(cardData.dob).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
+
+                  {cardData.anniversary && (
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-[0.2em] text-[var(--color-surface-muted)] mb-1 opacity-70">
+                        Anniversary
+                      </label>
+                      <p className="text-lg text-[var(--color-surface)] font-light tracking-wide">
+                        {new Date(cardData.anniversary).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-4 justify-center mt-8">
@@ -669,17 +757,38 @@ export default function NfcCardPage() {
                   <h2 className="text-3xl font-serif text-[var(--color-surface)] mb-2">
                     {status === "EDITING"
                       ? "Update Details"
-                      : "New Card Detected"}
+                      : scannedUuid
+                        ? "New Card Detected"
+                        : "Add New User"}
                   </h2>
                   <p className="text-[var(--color-surface-muted)] text-sm font-light">
                     {status === "EDITING"
                       ? "Modify the details associated with this card."
-                      : "Register this card to associate it with a guest."}
+                      : scannedUuid
+                        ? "Register this card to associate it with a guest."
+                        : "Enter details to register a new user."}
                   </p>
                   {status !== "EDITING" && (
-                    <p className="text-[var(--color-surface-muted)] font-mono text-xs opacity-50 mt-2">
-                      ID: {scannedUuid}
-                    </p>
+                    <div className="mb-4">
+                      {scannedUuid ? (
+                        <p className="text-[var(--color-surface-muted)] font-mono text-xs opacity-50 mt-2">
+                          ID: {scannedUuid}
+                        </p>
+                      ) : (
+                        <div>
+                          <label className="block text-xs uppercase tracking-widest text-[var(--color-surface-muted)] mb-1">
+                            Manual UUID (Scanner ID)
+                          </label>
+                          <input
+                            required
+                            type="text"
+                            className="w-full bg-[rgba(255,255,255,0.05)] border border-[var(--color-primary-strong)] rounded p-2 text-[var(--color-surface)] focus:border-[var(--color-accent)] outline-none transition-colors font-mono text-sm"
+                            placeholder="Enter Unique ID"
+                            onChange={(e) => setScannedUuid(e.target.value)}
+                          />
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -715,7 +824,7 @@ export default function NfcCardPage() {
                           .sort(
                             (a, b) =>
                               new Date(b.timestamp).getTime() -
-                              new Date(a.timestamp).getTime()
+                              new Date(a.timestamp).getTime(),
                           )
                           .map((visit, index) => (
                             <div
@@ -731,7 +840,7 @@ export default function NfcCardPage() {
                                   {
                                     hour: "2-digit",
                                     minute: "2-digit",
-                                  }
+                                  },
                                 )}
                               </span>
                             </div>
@@ -799,6 +908,38 @@ export default function NfcCardPage() {
                         setFormData({ ...formData, address: e.target.value })
                       }
                     />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-[var(--color-surface-muted)] mb-1">
+                        Date of Birth
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full bg-[rgba(255,255,255,0.05)] border border-[var(--color-primary-strong)] rounded p-2 text-[var(--color-surface)] focus:border-[var(--color-accent)] outline-none transition-colors"
+                        value={formData.dob}
+                        onChange={(e) =>
+                          setFormData({ ...formData, dob: e.target.value })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs uppercase tracking-widest text-[var(--color-surface-muted)] mb-1">
+                        Anniversary
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full bg-[rgba(255,255,255,0.05)] border border-[var(--color-primary-strong)] rounded p-2 text-[var(--color-surface)] focus:border-[var(--color-accent)] outline-none transition-colors"
+                        value={formData.anniversary}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            anniversary: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
