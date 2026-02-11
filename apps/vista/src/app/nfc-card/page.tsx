@@ -96,6 +96,34 @@ export default function NfcCardPage() {
     setShowUserList(false);
   };
 
+  const handleExportContacts = async () => {
+    try {
+      const response = await fetch('/api/contacts/export');
+      
+      if (!response.ok) {
+        throw new Error('Failed to export contacts');
+      }
+      
+      // Get the blob from the response
+      const blob = await response.blob();
+      
+      // Create a download link and trigger it
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'contacts.vcf';
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error exporting contacts:', error);
+      alert('Failed to export contacts. Please try again.');
+    }
+  };
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -451,6 +479,12 @@ export default function NfcCardPage() {
             }`}
           >
             {showUserList ? "Scan Card" : "View All Users"}
+          </button>
+          <button
+            onClick={handleExportContacts}
+            className="px-4 py-2 border border-[#E1D6C7]/30 text-[#E1D6C7] rounded hover:bg-[#E1D6C7]/10 transition-colors text-xs uppercase tracking-wider flex items-center"
+          >
+            Export Contacts
           </button>
           <button
             onClick={handleLogout}
