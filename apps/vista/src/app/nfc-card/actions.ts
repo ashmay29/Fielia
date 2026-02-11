@@ -15,7 +15,7 @@ export type CardData = {
   anniversary?: string;
   content?: string;
   createdAt?: string;
-  scanHistory?: { timestamp: Date }[];
+  scanHistory?: { timestamp: string }[];
 };
 
 export type CardResponse = {
@@ -70,8 +70,10 @@ export async function getCardByUuid(uuid: string): Promise<CardResponse> {
         dob: card.dob?.toISOString().split('T')[0],
         anniversary: card.anniversary?.toISOString().split('T')[0],
         content: card.content,
-        createdAt: card.createdAt?.toISOString(),
-        scanHistory: card.scanHistory,
+
+        scanHistory: card.scanHistory?.map((entry) => ({
+          timestamp: new Date(entry.timestamp).toISOString(),
+        })),
       },
     };
   } catch (error) {
@@ -98,8 +100,10 @@ export async function createCard(data: CardData): Promise<CardResponse> {
       return { success: false, error: "Card already exists" };
     }
 
+    const { scanHistory, ...restData } = data;
     const newCard = await Card.create({
-      ...data,
+      ...restData,
+      scanHistory: scanHistory?.map(s => ({ timestamp: new Date(s.timestamp) })),
       content: data.content || `${data.firstName} ${data.lastName}`,
     });
 
@@ -116,8 +120,10 @@ export async function createCard(data: CardData): Promise<CardResponse> {
         dob: newCard.dob?.toISOString().split('T')[0],
         anniversary: newCard.anniversary?.toISOString().split('T')[0],
         content: newCard.content,
-        createdAt: newCard.createdAt?.toISOString(),
-        scanHistory: newCard.scanHistory,
+
+        scanHistory: newCard.scanHistory?.map((entry) => ({
+          timestamp: new Date(entry.timestamp).toISOString(),
+        })),
       },
     };
   } catch (error) {
@@ -139,10 +145,12 @@ export async function updateCard(data: CardData): Promise<CardResponse> {
   try {
     await dbConnect();
 
+    const { scanHistory, ...restData } = data;
     const updatedCard = (await Card.findOneAndUpdate(
       { uuid: data.uuid },
       {
-        ...data,
+        ...restData,
+        scanHistory: scanHistory?.map(s => ({ timestamp: new Date(s.timestamp) })),
         dob: data.dob ? new Date(data.dob) : undefined,
         anniversary: data.anniversary ? new Date(data.anniversary) : undefined,
         content: data.content || `${data.firstName} ${data.lastName}`,
@@ -166,8 +174,10 @@ export async function updateCard(data: CardData): Promise<CardResponse> {
         dob: updatedCard.dob?.toISOString().split('T')[0],
         anniversary: updatedCard.anniversary?.toISOString().split('T')[0],
         content: updatedCard.content,
-        createdAt: updatedCard.createdAt?.toISOString(),
-        scanHistory: updatedCard.scanHistory,
+
+        scanHistory: updatedCard.scanHistory?.map((entry) => ({
+          timestamp: new Date(entry.timestamp).toISOString(),
+        })),
       },
     };
   } catch (error) {
@@ -228,7 +238,9 @@ export async function getAllCards(): Promise<AllCardsResponse> {
         preference: card.preference,
         content: card.content,
         createdAt: card.createdAt?.toISOString(),
-        scanHistory: card.scanHistory,
+        scanHistory: card.scanHistory?.map((entry) => ({
+          timestamp: new Date(entry.timestamp).toISOString(),
+        })),
       })),
     };
   } catch (error) {
