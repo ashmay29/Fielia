@@ -3,6 +3,24 @@ import dbConnect from '@/lib/db';
 import Card from '@/models/Card';
 import { getSession } from '@/lib/auth';
 
+// Escape special vCard characters according to RFC 2426
+function escapeVCardText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/\\/g, '\\\\')  // Backslash must be escaped first
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '');     // Remove carriage returns
+}
+
+// Sanitize phone number to prevent injection
+function sanitizePhone(phone: string): string {
+  if (!phone) return '';
+  // Allow only digits, +, -, (, ), and spaces
+  return phone.replace(/[^0-9+\-() ]/g, '');
+}
+
 export async function GET() {
   try {
     // Check authentication
@@ -25,16 +43,22 @@ export async function GET() {
     // Generate vCard 3.0 content
     const vcardContent = cards
       .map((card) => {
-        const firstName = card.firstName || '';
-        const lastName = card.lastName || '';
-        const phone = card.phone || '';
-        const formattedName = `${firstName} ${lastName}`.trim();
+        const firstName = escapeVCardText(card.firstName || '');
+        const lastName = escapeVCardText(card.lastName || '');
+        const phone = sanitizePhone(card.phone || '');
+        
+        // Fallback to phone number if both names are empty
+        let formattedName = `${card.firstName || ''} ${card.lastName || ''}`.trim();
+        if (!formattedName) {
+          formattedName = phone || 'Unknown Contact';
+        }
+        const escapedFormattedName = escapeVCardText(formattedName);
 
         return [
           'BEGIN:VCARD',
           'VERSION:3.0',
           `N:${lastName};${firstName};;;`,
-          `FN:${formattedName}`,
+          `FN:${escapedFormattedName}`,
           `TEL;TYPE=CELL,VOICE:${phone}`,
           'END:VCARD',
         ].join('\r\n');

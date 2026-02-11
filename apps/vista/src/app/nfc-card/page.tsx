@@ -98,7 +98,9 @@ export default function NfcCardPage() {
 
   const handleExportContacts = async () => {
     try {
-      const response = await fetch('/api/contacts/export');
+      const response = await fetch('/api/contacts/export', {
+        credentials: 'same-origin',
+      });
       
       if (!response.ok) {
         throw new Error('Failed to export contacts');
