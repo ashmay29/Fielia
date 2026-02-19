@@ -1,5 +1,31 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Features
+
+### NFC Card Manager
+
+The NFC Card Manager provides a comprehensive interface for managing NFC card enrollments with the following features:
+
+- **Real-time NFC Scanning**: Automatic detection and processing of NFC card scans
+- **User Management**: Complete CRUD operations for enrolled users
+- **Advanced Filtering**: Filter users by name, phone, address, and preference
+- **Search Functionality**: Quick search across all user data
+- **Total Count Display**: 
+  - Shows total enrolled users count
+  - Displays filtered results count when search or filters are active
+  - Accessible with ARIA live regions for screen readers
+- **Scan History Tracking**: Automatic visit tracking for each card scan
+- **Export Functionality**: Export contact data to CSV format
+- **Responsive Design**: Optimized for desktop and mobile viewing
+
+#### Accessibility
+
+The NFC manager viewer is built with accessibility in mind:
+- ARIA labels for all interactive elements
+- Live regions for dynamic count updates
+- Keyboard navigation support
+- High contrast color scheme (#E1D6C7 on #1a0505 background)
+
 ## Getting Started
 
 First, run the development server:
