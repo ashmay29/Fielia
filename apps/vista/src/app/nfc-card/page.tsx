@@ -137,17 +137,57 @@ export default function NfcCardPage() {
   };
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    nameFilter: "all" as "all" | "firstName" | "lastName",
+    phoneFilter: "all" as "all" | "with" | "without",
+    addressFilter: "all" as "all" | "with" | "without",
+    preferenceFilter: "all" as "all" | string,
+  });
+
+  // Get unique preferences for dropdown
+  const uniquePreferences = Array.from(
+    new Set(
+      allCards
+        .map((card) => card.preference)
+        .filter((pref) => pref && pref.trim() !== "")
+    )
+  ).sort();
 
   const filteredCards = allCards.filter((card) => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch =
+      !query ||
       card.firstName.toLowerCase().includes(query) ||
       card.lastName.toLowerCase().includes(query) ||
       card.phone.toLowerCase().includes(query) ||
       card.address.toLowerCase().includes(query) ||
       card.preference.toLowerCase().includes(query) ||
-      card.uuid.toLowerCase().includes(query)
-    );
+      card.uuid.toLowerCase().includes(query);
+
+    // Name filter
+    const matchesName =
+      filters.nameFilter === "all" ||
+      (filters.nameFilter === "firstName" && card.firstName) ||
+      (filters.nameFilter === "lastName" && card.lastName);
+
+    // Phone filter
+    const matchesPhone =
+      filters.phoneFilter === "all" ||
+      (filters.phoneFilter === "with" && card.phone && card.phone.trim() !== "") ||
+      (filters.phoneFilter === "without" && (!card.phone || card.phone.trim() === ""));
+
+    // Address filter
+    const matchesAddress =
+      filters.addressFilter === "all" ||
+      (filters.addressFilter === "with" && card.address && card.address.trim() !== "") ||
+      (filters.addressFilter === "without" && (!card.address || card.address.trim() === ""));
+
+    // Preference filter
+    const matchesPreference =
+      filters.preferenceFilter === "all" ||
+      (card.preference && card.preference.toLowerCase() === filters.preferenceFilter.toLowerCase());
+
+    return matchesSearch && matchesName && matchesPhone && matchesAddress && matchesPreference;
   });
 
   // Toggle User List View
@@ -500,24 +540,93 @@ export default function NfcCardPage() {
       {showUserList ? (
         /* User List View */
         <div className="relative z-10 w-full max-w-7xl mx-auto p-4 md:p-8 overflow-auto">
-          <div className="mb-6 flex justify-between items-center">
-            <h2 className="text-2xl font-serif text-[#E1D6C7]">
-              Enrolled Users
-            </h2>
-            <div className="relative w-64">
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-black/40 border border-[#E1D6C7]/30 rounded px-4 py-2 text-[#E1D6C7] placeholder-[#E1D6C7]/50 focus:outline-none focus:border-[#E1D6C7] transition-colors text-sm"
-              />
-              {searchQuery && (
+          <div className="mb-6 flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-serif text-[#E1D6C7]">
+                Enrolled Users
+              </h2>
+              <div className="relative w-64">
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-black/40 border border-[#E1D6C7]/30 rounded px-4 py-2 text-[#E1D6C7] placeholder-[#E1D6C7]/50 focus:outline-none focus:border-[#E1D6C7] transition-colors text-sm"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#E1D6C7]/50 hover:text-[#E1D6C7]"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {/* Filter Dropdowns */}
+            <div className="flex flex-wrap gap-3 items-center bg-black/20 p-4 rounded-lg border border-[#E1D6C7]/10">
+              <span className="text-xs uppercase tracking-wider text-[#E1D6C7]/70 font-semibold">
+                Filters:
+              </span>
+              
+              <select
+                value={filters.nameFilter}
+                onChange={(e) => setFilters({ ...filters, nameFilter: e.target.value as "all" | "firstName" | "lastName" })}
+                className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
+              >
+                <option value="all">All Names</option>
+                <option value="firstName">First Name Only</option>
+                <option value="lastName">Last Name Only</option>
+              </select>
+
+              <select
+                value={filters.phoneFilter}
+                onChange={(e) => setFilters({ ...filters, phoneFilter: e.target.value as "all" | "with" | "without" })}
+                className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
+              >
+                <option value="all">All Phone Numbers</option>
+                <option value="with">With Phone Number</option>
+                <option value="without">Without Phone Number</option>
+              </select>
+
+              <select
+                value={filters.addressFilter}
+                onChange={(e) => setFilters({ ...filters, addressFilter: e.target.value as "all" | "with" | "without" })}
+                className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
+              >
+                <option value="all">All Addresses</option>
+                <option value="with">With Address</option>
+                <option value="without">Without Address</option>
+              </select>
+
+              <select
+                value={filters.preferenceFilter}
+                onChange={(e) => setFilters({ ...filters, preferenceFilter: e.target.value })}
+                className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
+              >
+                <option value="all">All Preferences</option>
+                {uniquePreferences.map((pref) => (
+                  <option key={pref} value={pref}>
+                    {pref}
+                  </option>
+                ))}
+              </select>
+
+              {(filters.nameFilter !== "all" || 
+                filters.phoneFilter !== "all" || 
+                filters.addressFilter !== "all" || 
+                filters.preferenceFilter !== "all") && (
                 <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#E1D6C7]/50 hover:text-[#E1D6C7]"
+                  onClick={() => setFilters({
+                    nameFilter: "all",
+                    phoneFilter: "all",
+                    addressFilter: "all",
+                    preferenceFilter: "all",
+                  })}
+                  className="ml-auto px-3 py-1.5 text-xs text-[#E1D6C7]/70 hover:text-[#E1D6C7] border border-[#E1D6C7]/30 hover:border-[#E1D6C7] rounded transition-colors"
                 >
-                  ×
+                  Clear Filters
                 </button>
               )}
             </div>
@@ -527,6 +636,9 @@ export default function NfcCardPage() {
               <table className="w-full">
                 <thead className="bg-[#C5A572]/10 border-b border-[#E1D6C7]/20">
                   <tr>
+                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
+                      Sr. No.
+                    </th>
                     <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
                       Name
                     </th>
@@ -557,16 +669,16 @@ export default function NfcCardPage() {
                   {filteredCards.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={7}
+                        colSpan={9}
                         className="px-4 py-8 text-center text-[#E1D6C7]/50"
                       >
-                        {searchQuery
-                          ? "No users found matching your search"
+                        {searchQuery || filters.nameFilter !== "all" || filters.phoneFilter !== "all" || filters.addressFilter !== "all" || filters.preferenceFilter !== "all"
+                          ? "No users found matching your filters"
                           : "No users enrolled yet"}
                       </td>
                     </tr>
                   ) : (
-                    filteredCards.map((card) => (
+                    filteredCards.map((card, index) => (
                       <tr
                         key={card.uuid}
                         onClick={() => {
@@ -589,6 +701,9 @@ export default function NfcCardPage() {
                         }}
                         className="hover:bg-[#E1D6C7]/5 transition-colors cursor-pointer"
                       >
+                        <td className="px-4 py-4 text-sm text-[#E1D6C7]/70 font-mono">
+                          {index + 1}
+                        </td>
                         <td className="px-4 py-4 font-medium">
                           {card.firstName} {card.lastName}
                         </td>
