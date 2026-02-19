@@ -153,6 +153,13 @@ export default function NfcCardPage() {
     )
   ).sort();
 
+  // Check if any filters are active
+  const hasActiveFilters = 
+    filters.nameFilter !== "all" || 
+    filters.phoneFilter !== "all" || 
+    filters.addressFilter !== "all" || 
+    filters.preferenceFilter !== "all";
+
   const filteredCards = allCards.filter((card) => {
     const query = searchQuery.toLowerCase();
     const matchesSearch =
@@ -167,8 +174,8 @@ export default function NfcCardPage() {
     // Name filter
     const matchesName =
       filters.nameFilter === "all" ||
-      (filters.nameFilter === "firstName" && card.firstName) ||
-      (filters.nameFilter === "lastName" && card.lastName);
+      (filters.nameFilter === "firstName" && card.firstName && card.firstName.trim() !== "") ||
+      (filters.nameFilter === "lastName" && card.lastName && card.lastName.trim() !== "");
 
     // Phone filter
     const matchesPhone =
@@ -613,10 +620,7 @@ export default function NfcCardPage() {
                 ))}
               </select>
 
-              {(filters.nameFilter !== "all" || 
-                filters.phoneFilter !== "all" || 
-                filters.addressFilter !== "all" || 
-                filters.preferenceFilter !== "all") && (
+              {hasActiveFilters && (
                 <button
                   onClick={() => setFilters({
                     nameFilter: "all",
@@ -672,7 +676,7 @@ export default function NfcCardPage() {
                         colSpan={9}
                         className="px-4 py-8 text-center text-[#E1D6C7]/50"
                       >
-                        {searchQuery || filters.nameFilter !== "all" || filters.phoneFilter !== "all" || filters.addressFilter !== "all" || filters.preferenceFilter !== "all"
+                        {searchQuery || hasActiveFilters
                           ? "No users found matching your filters"
                           : "No users enrolled yet"}
                       </td>
