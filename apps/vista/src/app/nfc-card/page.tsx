@@ -549,9 +549,24 @@ export default function NfcCardPage() {
         <div className="relative z-10 w-full max-w-7xl mx-auto p-4 md:p-8 overflow-auto">
           <div className="mb-6 flex flex-col gap-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-serif text-[#E1D6C7]">
-                Enrolled Users
-              </h2>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-2xl font-serif text-[#E1D6C7]">
+                  Enrolled Users
+                </h2>
+                <div className="flex items-center gap-3" role="status" aria-live="polite">
+                  <span className="text-xs uppercase tracking-wider text-[#E1D6C7]/70 font-semibold">
+                    Total: <span className="text-[#C5A572]">{allCards.length}</span>
+                  </span>
+                  {(searchQuery || hasActiveFilters) && (
+                    <>
+                      <span className="text-[#E1D6C7]/30">|</span>
+                      <span className="text-xs uppercase tracking-wider text-[#E1D6C7]/70 font-semibold">
+                        Showing: <span className="text-[#C5A572]">{filteredCards.length}</span>
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
               <div className="relative w-64">
                 <input
                   type="text"
@@ -564,6 +579,7 @@ export default function NfcCardPage() {
                   <button
                     onClick={() => setSearchQuery("")}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#E1D6C7]/50 hover:text-[#E1D6C7]"
+                    aria-label="Clear search"
                   >
                     ×
                   </button>
