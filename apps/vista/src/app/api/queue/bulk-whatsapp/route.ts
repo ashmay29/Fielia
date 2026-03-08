@@ -12,7 +12,14 @@ const receiver = new Receiver({
 
 // Configuration
 const BATCH_SIZE = 50;
-const INTER_MESSAGE_DELAY_MS = 50; // ~80 msgs/sec to stay within Meta rate limits
+const INTER_MESSAGE_DELAY_MS = Math.max(
+  0,
+  Number(process.env.WHATSAPP_INTER_MESSAGE_DELAY_MS || "150"),
+);
+const INTER_BATCH_DELAY_MS = Math.max(
+  0,
+  Number(process.env.WHATSAPP_INTER_BATCH_DELAY_MS || "1000"),
+);
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -89,11 +96,12 @@ export async function POST(request: NextRequest) {
       cards.map((c: any) => [c.uuid, c.phone as string]),
     );
 
-    // Process in batches
+    // Process in batches with throttling to avoid API burst failures.
     for (let i = 0; i < uuids.length; i += BATCH_SIZE) {
       const batch = uuids.slice(i, i + BATCH_SIZE);
 
-      for (const uuid of batch) {
+      for (let batchIndex = 0; batchIndex < batch.length; batchIndex++) {
+        const uuid = batch[batchIndex];
         const phone = cardMap.get(uuid);
 
         if (!phone) {
@@ -192,10 +200,17 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Throttle between messages
-        if (i + batch.indexOf(uuid) < uuids.length - 1) {
+        // Throttle between messages.
+        const globalIndex = i + batchIndex;
+        if (globalIndex < uuids.length - 1) {
           await sleep(INTER_MESSAGE_DELAY_MS);
         }
+      }
+
+      // Add a brief pause between batches to smooth out traffic spikes.
+      const hasMoreBatches = i + BATCH_SIZE < uuids.length;
+      if (hasMoreBatches && INTER_BATCH_DELAY_MS > 0) {
+        await sleep(INTER_BATCH_DELAY_MS);
       }
     }
 
