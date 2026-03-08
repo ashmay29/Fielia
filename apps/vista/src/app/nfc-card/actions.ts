@@ -337,6 +337,8 @@ export async function dispatchBulkWhatsAppJob(
       uuid: r.uuid,
       phone: r.phone,
       templateName,
+      templateVariables,
+      mediaUrl,
       status: "queued" as const,
     }));
 

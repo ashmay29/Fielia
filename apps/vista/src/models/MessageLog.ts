@@ -5,6 +5,8 @@ export interface IMessageLog extends Document {
   uuid: string;
   phone: string;
   templateName: string;
+  templateVariables: string[];
+  mediaUrl?: string;
   status: "queued" | "sent" | "delivered" | "read" | "failed";
   error?: string;
   whatsappMessageId?: string;
@@ -31,6 +33,14 @@ const MessageLogSchema: Schema = new Schema(
     templateName: {
       type: String,
       required: true,
+    },
+    templateVariables: {
+      type: [String],
+      default: [],
+    },
+    mediaUrl: {
+      type: String,
+      required: false,
     },
     status: {
       type: String,
