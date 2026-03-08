@@ -8,8 +8,13 @@
  * Shows what messages would be sent without actually sending them.
  */
 
-import * as fs from "fs";
+import * as dotenv from "dotenv";
 import * as path from "path";
+
+// Load .env file FIRST before importing anything that needs env vars
+dotenv.config({ path: path.join(__dirname, "../.env") });
+
+import * as fs from "fs";
 import { parse } from "csv-parse/sync";
 import { normalizePhoneNumber } from "../src/lib/whatsapp";
 
@@ -18,7 +23,7 @@ import { normalizePhoneNumber } from "../src/lib/whatsapp";
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CONFIG = {
-  CSV_PATH: path.join(__dirname, "../data/_Contact List 2026 - High Spenders  - GIGI.csv"),
+  CSV_PATH: path.join(__dirname, "../data/_Contact List 2026 - High Spenders  - Scarlett Bandra.csv"),
   TEMPLATE_NAME: "felia_nfc",
   HEADER_IMAGE_URL: "https://res.cloudinary.com/doyttqu8x/image/upload/v1772821919/whatsapp-media/axx1pmp4va0yji1fsujk.jpg",
   TEMPLATE_BODY_VARIABLES: [

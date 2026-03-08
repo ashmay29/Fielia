@@ -12,8 +12,13 @@
  * - Detailed success/failure reports
  */
 
-import * as fs from "fs";
+import * as dotenv from "dotenv";
 import * as path from "path";
+
+// Load .env file FIRST before importing anything that needs env vars
+dotenv.config({ path: path.join(__dirname, "../.env") });
+
+import * as fs from "fs";
 import { parse } from "csv-parse/sync";
 import {
   sendWhatsAppTemplate,
