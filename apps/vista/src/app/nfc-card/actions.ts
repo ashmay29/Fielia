@@ -2,7 +2,11 @@
 
 import dbConnect from "@/lib/db";
 import Card, { ICard } from "@/models/Card";
+import MessageLog from "@/models/MessageLog";
 import { getSession } from "@/lib/auth";
+import { normalizePhoneNumber } from "@/lib/whatsapp";
+import { Client } from "@upstash/qstash";
+import { nanoid } from "nanoid";
 
 export type CardData = {
   uuid: string;
@@ -246,5 +250,136 @@ export async function getAllCards(): Promise<AllCardsResponse> {
   } catch (error) {
     console.error("Error fetching cards:", error);
     return { success: false, error: "Failed to fetch cards" };
+  }
+}
+
+// ─── Bulk WhatsApp Messaging ──────────────────────────────────────────────────
+
+export type BulkWhatsAppResponse = {
+  success: boolean;
+  jobId?: string;
+  totalQueued?: number;
+  skippedUsers?: { uuid: string; firstName: string; lastName: string; reason: string }[];
+  error?: string;
+};
+
+/**
+ * Dispatches a bulk WhatsApp messaging job.
+ * Validates phone numbers, creates MessageLog entries, and enqueues the job via QStash.
+ * The `mediaUrl` is an already-uploaded Cloudinary public URL passed from the frontend.
+ */
+export async function dispatchBulkWhatsAppJob(
+  uuids: string[],
+  templateName: string,
+  templateVariables: string[],
+  mediaUrl?: string,
+): Promise<BulkWhatsAppResponse> {
+  const session = await getSession();
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  if (!uuids.length || !templateName) {
+    return { success: false, error: "Missing required fields" };
+  }
+
+  try {
+    await dbConnect();
+
+    // Fetch all cards for the selected UUIDs
+    const cards = (await Card.find({ uuid: { $in: uuids } }).lean()) as unknown as ICard[];
+
+    // Validate phone numbers and split into valid/skipped
+    const validRecipients: { uuid: string; phone: string }[] = [];
+    const skippedUsers: { uuid: string; firstName: string; lastName: string; reason: string }[] = [];
+
+    for (const card of cards) {
+      const normalized = normalizePhoneNumber(card.phone);
+      if (normalized) {
+        validRecipients.push({ uuid: card.uuid, phone: normalized });
+      } else {
+        skippedUsers.push({
+          uuid: card.uuid,
+          firstName: card.firstName,
+          lastName: card.lastName,
+          reason: card.phone ? "Invalid phone number format" : "No phone number",
+        });
+      }
+    }
+
+    // Also mark UUIDs that weren't found in the database
+    const foundUuids = new Set(cards.map((c) => c.uuid));
+    for (const uuid of uuids) {
+      if (!foundUuids.has(uuid)) {
+        skippedUsers.push({
+          uuid,
+          firstName: "Unknown",
+          lastName: "User",
+          reason: "Card not found in database",
+        });
+      }
+    }
+
+    if (validRecipients.length === 0) {
+      return {
+        success: false,
+        error: "No valid recipients — all selected users have missing or invalid phone numbers",
+        skippedUsers,
+      };
+    }
+
+    // Generate a unique job ID
+    const jobId = nanoid(12);
+
+    // Create MessageLog entries for each valid recipient
+    const logEntries = validRecipients.map((r) => ({
+      jobId,
+      uuid: r.uuid,
+      phone: r.phone,
+      templateName,
+      status: "queued" as const,
+    }));
+
+    await MessageLog.insertMany(logEntries);
+
+    // Dispatch to QStash
+    const qstashClient = new Client({
+      token: process.env.UPSTASH_QSTASH_TOKEN!,
+    });
+
+    // Determine the base URL for QStash to call back
+    const baseUrl = 
+      process.env.NEXT_PUBLIC_APP_URL || 
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+    
+    if (!baseUrl) {
+      return {
+        success: false,
+        error: "NEXT_PUBLIC_APP_URL must be set for local development (use ngrok URL)",
+      };
+    }
+
+    await qstashClient.publishJSON({
+      url: `${baseUrl}/api/queue/bulk-whatsapp`,
+      body: {
+        jobId,
+        uuids: validRecipients.map((r) => r.uuid),
+        templateName,
+        templateVariables,
+        mediaUrl,
+      },
+      retries: 3,
+    });
+
+    return {
+      success: true,
+      jobId,
+      totalQueued: validRecipients.length,
+      skippedUsers: skippedUsers.length > 0 ? skippedUsers : undefined,
+    };
+  } catch (error) {
+    console.error("Error dispatching bulk WhatsApp job:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to dispatch messaging job";
+    return { success: false, error: `Failed to dispatch: ${errorMessage}` };
   }
 }

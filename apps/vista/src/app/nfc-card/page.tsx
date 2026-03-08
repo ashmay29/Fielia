@@ -11,6 +11,9 @@ import {
 } from "./actions";
 import { loginAdmin, logoutAdmin } from "../admin/actions";
 import { motion } from "framer-motion";
+import BulkMessageModal from "@/components/nfc/BulkMessageModal";
+import MessageInsightsPanel from "@/components/nfc/MessageInsightsPanel";
+import UserSelectionTable from "@/components/nfc/UserSelectionTable";
 
 export default function NfcCardPage() {
   // Auth & View State
@@ -21,6 +24,10 @@ export default function NfcCardPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showUserList, setShowUserList] = useState(false);
   const [allCards, setAllCards] = useState<CardData[]>([]);
+
+  // Bulk messaging state
+  const [selectedUuids, setSelectedUuids] = useState<string[]>([]);
+  const [showBulkModal, setShowBulkModal] = useState(false);
 
   // Scanner State
   const [status, setStatus] = useState<
@@ -652,118 +659,63 @@ export default function NfcCardPage() {
             </div>
           </div>
           <div className="bg-black/40 backdrop-blur-md border border-[#E1D6C7]/20 rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-[#C5A572]/10 border-b border-[#E1D6C7]/20">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Sr. No.
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Phone
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Address
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Preference
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Visits
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Enrolled
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      UUID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#E1D6C7]/10">
-                  {filteredCards.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={9}
-                        className="px-4 py-8 text-center text-[#E1D6C7]/50"
-                      >
-                        {searchQuery || hasActiveFilters
-                          ? "No users found matching your filters"
-                          : "No users enrolled yet"}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredCards.map((card, index) => (
-                      <tr
-                        key={card.uuid}
-                        onClick={() => {
-                          console.log("Row clicked", card.uuid);
-                          setFormData({
-                            firstName: card.firstName,
-                            lastName: card.lastName,
-                            phone: card.phone || "",
-                            address: card.address || "",
-                            preference: card.preference || "",
-                            content: card.content || "",
-                            dob: card.dob || "",
-                            anniversary: card.anniversary || "",
-                          });
-                          setScannedUuid(card.uuid);
-                          setCardData(card);
-                          setStatus("EDITING");
-                          setShowUserList(false); // Hide list to show form
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        className="hover:bg-[#E1D6C7]/5 transition-colors cursor-pointer"
-                      >
-                        <td className="px-4 py-4 text-sm text-[#E1D6C7]/70 font-mono">
-                          {index + 1}
-                        </td>
-                        <td className="px-4 py-4 font-medium">
-                          {card.firstName} {card.lastName}
-                        </td>
-                        <td className="px-4 py-4 text-sm">{card.phone}</td>
-                        <td
-                          className="px-4 py-4 text-sm max-w-xs truncate"
-                          title={card.address}
-                        >
-                          {card.address}
-                        </td>
-                        <td
-                          className="px-4 py-4 text-sm max-w-xs truncate"
-                          title={card.preference}
-                        >
-                          {card.preference}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-[#E1D6C7]/70">
-                          {card.scanHistory?.length || 0}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-[#E1D6C7]/70">
-                          {formatDate(card.createdAt)}
-                        </td>
-                        <td className="px-4 py-4 text-xs font-mono text-[#E1D6C7]/50">
-                          {card.uuid}
-                        </td>
-                        <td className="px-4 py-4 text-sm">
-                          <button
-                            onClick={(e) => handleDelete(card.uuid, e)}
-                            className="text-red-400 hover:text-red-300 hover:underline text-xs uppercase tracking-wider"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <UserSelectionTable
+              cards={filteredCards}
+              selectedUuids={selectedUuids}
+              onSelectionChange={setSelectedUuids}
+              searchQuery={searchQuery}
+              formatDate={formatDate}
+              onRowClick={(card) => {
+                console.log("Row clicked", card.uuid);
+                setFormData({
+                  firstName: card.firstName,
+                  lastName: card.lastName,
+                  phone: card.phone || "",
+                  address: card.address || "",
+                  preference: card.preference || "",
+                  content: card.content || "",
+                  dob: card.dob || "",
+                  anniversary: card.anniversary || "",
+                });
+                setScannedUuid(card.uuid);
+                setCardData(card);
+                setStatus("EDITING");
+                setShowUserList(false);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              onDelete={handleDelete}
+            />
           </div>
+
+          {/* Floating Bulk Message Button */}
+          {selectedUuids.length > 0 && (
+            <div className="fixed bottom-8 right-8 z-30">
+              <button
+                onClick={() => setShowBulkModal(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-[#C5A572] text-[#1a0505] rounded-full font-bold text-sm uppercase tracking-wider shadow-lg hover:bg-[#E1D6C7] transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Bulk Message ({selectedUuids.length})
+              </button>
+            </div>
+          )}
+
+          {/* Bulk Message Modal */}
+          {showBulkModal && (
+            <BulkMessageModal
+              selectedUuids={selectedUuids}
+              allCards={allCards}
+              onClose={() => setShowBulkModal(false)}
+              onSuccessfulClose={() => {
+                setShowBulkModal(false);
+                setSelectedUuids([]);
+              }}
+            />
+          )}
+
+          <MessageInsightsPanel className="fixed z-40 bottom-16 left-4 right-4 sm:right-auto sm:left-6 sm:w-[360px]" />
         </div>
       ) : (
         /* Scanner View (existing content wrapped) */
