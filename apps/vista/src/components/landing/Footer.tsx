@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-[#E1D6C7] text-[#370D10] py-10 md:py-16 relative overflow-hidden">
+    <footer className="w-full bg-[#E1D6C7] text-[#370D10] py-6 md:py-10 relative overflow-hidden">
       {/* Texture Overlay */}
       <div
         className="absolute inset-0 opacity-10 mix-blend-multiply pointer-events-none"
@@ -14,11 +14,11 @@ const Footer = () => {
 
       <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col items-center text-center">
         {/* Logo Emblem */}
-        <div className="mb-8 relative group">
+        <div className="mb-6 relative group">
           <div className="absolute inset-0 rounded-full border border-[#C5A572]/30 scale-110 group-hover:scale-125 transition-transform duration-700 ease-out" />
           <div className="absolute inset-0 rounded-full border border-[#C5A572]/10 scale-150 group-hover:scale-110 transition-transform duration-700 ease-out delay-75" />
 
-          <div className="w-24 h-24 md:w-32 md:h-32 bg-black rounded-full p-2 overflow-hidden shadow-2xl relative z-10 border border-[#C5A572]/20">
+          <div className="w-20 h-20 md:w-28 md:h-28 bg-black rounded-full p-2 overflow-hidden shadow-2xl relative z-10 border border-[#C5A572]/20">
             <div className="w-full h-full rounded-full overflow-hidden bg-black flex items-center justify-center">
               <video
                 autoPlay
@@ -37,7 +37,7 @@ const Footer = () => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="mb-8">
+        <nav className="mb-6">
           <ul className="flex flex-wrap justify-center gap-x-6 gap-y-3 md:gap-12">
             {["The Bar", "Community", "Story", "Dining", "Experience"].map(
               (item) => (
@@ -59,7 +59,7 @@ const Footer = () => {
         </nav>
 
         {/* Divider with ornamental detail */}
-        <div className="flex items-center gap-4 w-full max-w-sm mb-8 opacity-40">
+        <div className="flex items-center gap-4 w-full max-w-sm mb-6 opacity-40">
           <div className="h-px bg-[#370D10] flex-1" />
           <div className="w-1.5 h-1.5 rotate-45 border border-[#370D10]" />
           <div className="h-px bg-[#370D10] flex-1" />
@@ -67,39 +67,34 @@ const Footer = () => {
 
         {/* Contact Info */}
         <div
-          className="space-y-2 mb-10 text-[#370D10]/80"
+          className="space-y-2 mb-4 text-[#370D10]/80"
           style={{ fontFamily: "var(--font-cormorant), serif" }}
         >
           <p className="text-base md:text-lg tracking-wide">
             Mahalaxmi Racecourse, Mumbai, India
           </p>
-          <p className="text-base md:text-lg tracking-wide font-light">
-            <span className="font-normal">+91 (022) 123-4567</span>{" "}
-            <span className="mx-2 text-[#C5A572]">•</span>{" "}
-            <span className="font-normal">concierge@fielia.com</span>
-          </p>
         </div>
 
         {/* Copyright */}
-        <div className="flex flex-col md:flex-row items-center justify-between w-full border-t border-[#370D10]/10 pt-6 mt-2 text-[#370D10]/50 text-[9px] uppercase tracking-[0.2em]">
-          <p className="md:flex-1 md:text-left">
+        <div className="flex flex-col md:flex-row items-center justify-between w-full border-t border-[#370D10]/10 pt-4 mt-2 text-[#370D10]/50 text-[9px] uppercase tracking-[0.2em] md:text-xs gap-4 md:gap-0">
+          <p className="md:flex-1 md:text-left text-[9px]">
             © {new Date().getFullYear()} Fielia. All rights reserved.
           </p>
 
-          <div className="flex gap-6 mt-4 md:mt-0 md:flex-1 md:justify-center">
-            <Link href="#" className="hover:text-[#370D10] transition-colors">
+          <div className="flex gap-4 sm:gap-6 mt-2 md:mt-0 md:flex-1 md:justify-center">
+            <Link href="/privacy-policy" className="text-[#370D10] font-bold text-[10px] md:text-xs hover:text-black transition-colors tracking-widest text-center">
               Privacy Policy
             </Link>
-            <Link href="#" className="hover:text-[#370D10] transition-colors">
+            <Link href="/terms-of-service" className="text-[#370D10] font-bold text-[10px] md:text-xs hover:text-black transition-colors tracking-widest text-center">
               Terms of Service
             </Link>
           </div>
 
-          <div className="flex md:flex-1 md:justify-end mt-4 md:mt-0">
+          <div className="flex md:flex-1 md:justify-end mt-2 md:mt-0">
             <Link
-              href="https://eigensu.com"
+              href="https://eigensu.in"
               target="_blank"
-              className="text-[#370D10]/80 hover:text-[#370D10] transition-colors tracking-widest"
+              className="text-[#370D10] font-bold text-[10px] md:text-xs hover:text-black transition-colors tracking-widest text-center"
             >
               Powered by Eigensu
             </Link>
