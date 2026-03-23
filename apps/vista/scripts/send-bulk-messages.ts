@@ -30,7 +30,9 @@ import {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CONFIG = {
-  CSV_PATH: path.join(__dirname, "../data/_Contact List 2026 - High Spenders  - GIGI.csv"),
+  CSV_PATH:
+    process.env.CSV_PATH ||
+    path.join(__dirname, "../data/_Contact List 2026 - High Spenders  - GIGI.csv"),
   TEMPLATE_NAME: "felia_nfc",
   HEADER_IMAGE_URL: "https://res.cloudinary.com/doyttqu8x/image/upload/v1772821919/whatsapp-media/axx1pmp4va0yji1fsujk.jpg",
   TEMPLATE_BODY_VARIABLES: [
@@ -47,8 +49,13 @@ const CONFIG = {
   
   // Logging paths
   LOG_DIR: path.join(__dirname, "../logs"),
-  RESULTS_FILE: path.join(__dirname, "../logs/bulk-send-results.json"),
-  ERROR_LOG_FILE: path.join(__dirname, "../logs/bulk-send-errors.log"),
+  RESULTS_FILE:
+    process.env.RESULTS_FILE ||
+    path.join(__dirname, "../logs/bulk-send-results.json"),
+  ERROR_LOG_FILE:
+    process.env.ERROR_LOG_FILE ||
+    path.join(__dirname, "../logs/bulk-send-errors.log"),
+  AUTO_CONFIRM: (process.env.AUTO_CONFIRM || "false").toLowerCase() === "true",
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -374,12 +381,16 @@ async function main() {
     console.log(
       `✍️  Body params: ${CONFIG.TEMPLATE_BODY_VARIABLES[0]} | ${CONFIG.TEMPLATE_BODY_VARIABLES[1]}`,
     );
-    console.log(`\nPress Ctrl+C to cancel, or press Enter to continue...`);
+    if (!CONFIG.AUTO_CONFIRM) {
+      console.log(`\nPress Ctrl+C to cancel, or press Enter to continue...`);
 
-    // Wait for user confirmation
-    await new Promise<void>((resolve) => {
-      process.stdin.once("data", () => resolve());
-    });
+      // Wait for user confirmation
+      await new Promise<void>((resolve) => {
+        process.stdin.once("data", () => resolve());
+      });
+    } else {
+      console.log("\nAUTO_CONFIRM=true, continuing without manual prompt...");
+    }
 
     // Create queue and process
     const queue = new MessageQueue(contacts);

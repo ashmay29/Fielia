@@ -7,6 +7,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function GET(request: NextRequest) {
   const phone = request.nextUrl.searchParams.get("phone");
+  const templateParam = request.nextUrl.searchParams.get("template");
+  const var1 = request.nextUrl.searchParams.get("var1");
+  const mediaUrlParam = request.nextUrl.searchParams.get("mediaUrl");
+  const endpointMode = request.nextUrl.searchParams.get("endpoint") || "marketing";
 
   if (!phone) {
     return NextResponse.json(
@@ -24,20 +28,28 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const templateName = "felia_nfc";
-  const variables = [
-    "Mumbai's first Cocktail Cinema Bar & European Supper Theatre,",
-    "nestled within the iconic Race Course.",
-  ];
+  const templateName = templateParam || "felia_nfc";
+  const variables = var1
+    ? [var1]
+    : [
+        "Mumbai's first Cocktail Cinema Bar & European Supper Theatre,",
+        "nestled within the iconic Race Course.",
+      ];
   const mediaUrl =
-    "https://res.cloudinary.com/doyttqu8x/image/upload/v1772821919/whatsapp-media/axx1pmp4va0yji1fsujk.jpg";
+    mediaUrlParam === "none"
+      ? undefined
+      : mediaUrlParam ||
+        "https://res.cloudinary.com/doyttqu8x/image/upload/v1772821919/whatsapp-media/axx1pmp4va0yji1fsujk.jpg";
 
   try {
     const result = await sendWhatsAppTemplate(
       normalizedPhone,
       templateName,
       variables,
-      mediaUrl
+      mediaUrl,
+      {
+        endpointMode: endpointMode === "standard" ? "standard" : "marketing",
+      }
     );
 
     if (result.success) {
@@ -46,6 +58,9 @@ export async function GET(request: NextRequest) {
         message: "Message sent successfully",
         phone: normalizedPhone,
         whatsappMessageId: result.whatsappMessageId,
+        endpointRequested: result.endpointRequested,
+        endpointUsed: result.endpointUsed,
+        fallbackUsed: result.fallbackUsed,
         timestamp: new Date().toISOString(),
       });
     } else {
@@ -54,6 +69,9 @@ export async function GET(request: NextRequest) {
           success: false,
           error: result.error,
           phone: normalizedPhone,
+          endpointRequested: result.endpointRequested,
+          endpointUsed: result.endpointUsed,
+          fallbackUsed: result.fallbackUsed,
           timestamp: new Date().toISOString(),
         },
         { status: 400 }

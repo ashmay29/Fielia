@@ -5,6 +5,7 @@ import Card, { ICard } from "@/models/Card";
 import MessageLog from "@/models/MessageLog";
 import { getSession } from "@/lib/auth";
 import { normalizePhoneNumber } from "@/lib/whatsapp";
+import type { WhatsAppEndpointMode } from "@/lib/whatsapp";
 import { Client } from "@upstash/qstash";
 import { nanoid } from "nanoid";
 
@@ -273,6 +274,7 @@ export async function dispatchBulkWhatsAppJob(
   templateName: string,
   templateVariables: string[],
   mediaUrl?: string,
+  endpointMode: WhatsAppEndpointMode = "marketing",
 ): Promise<BulkWhatsAppResponse> {
   const session = await getSession();
   if (!session) {
@@ -339,6 +341,7 @@ export async function dispatchBulkWhatsAppJob(
       templateName,
       templateVariables,
       mediaUrl,
+      endpointRequested: endpointMode,
       status: "queued" as const,
     }));
 
@@ -369,6 +372,7 @@ export async function dispatchBulkWhatsAppJob(
         templateName,
         templateVariables,
         mediaUrl,
+        endpointMode,
       },
       retries: 3,
     });

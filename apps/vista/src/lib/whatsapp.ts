@@ -69,7 +69,29 @@ export interface SendTemplateResult {
   success: boolean;
   whatsappMessageId?: string;
   error?: string;
+  endpointRequested?: WhatsAppEndpointMode;
+  endpointUsed?: WhatsAppEndpointMode;
+  fallbackUsed?: boolean;
 }
+
+export type WhatsAppEndpointMode = "standard" | "marketing";
+
+export interface SendTemplateOptions {
+  endpointMode?: WhatsAppEndpointMode;
+  allowFallbackToStandard?: boolean;
+  logContext?: Record<string, string | number | boolean | null | undefined>;
+}
+
+type WhatsAppEndpoint = {
+  mode: WhatsAppEndpointMode;
+  path: string;
+};
+
+const STANDARD_ENDPOINT: WhatsAppEndpoint = { mode: "standard", path: "messages" };
+const MARKETING_ENDPOINT: WhatsAppEndpoint = {
+  mode: "marketing",
+  path: "marketing_messages",
+};
 
 /**
  * Sends a WhatsApp template message.
@@ -82,6 +104,7 @@ export async function sendWhatsAppTemplate(
   templateName: string,
   variables: string[],
   mediaUrl?: string,
+  options?: SendTemplateOptions,
 ): Promise<SendTemplateResult> {
   const components: any[] = [];
 
@@ -124,16 +147,25 @@ export async function sendWhatsAppTemplate(
     },
   };
 
-  console.log("[WhatsApp] Sending template message:", {
+  const endpointRequested = options?.endpointMode || "standard";
+  const primaryEndpoint =
+    endpointRequested === "marketing" ? MARKETING_ENDPOINT : STANDARD_ENDPOINT;
+  const fallbackEndpoint = STANDARD_ENDPOINT;
+  const allowFallback =
+    endpointRequested === "marketing" && options?.allowFallbackToStandard !== false;
+
+  const baseLogContext = {
     to: toNumber,
     template: templateName,
     variables: variables.length,
     mediaUrl: mediaUrl ? "provided" : "none",
-  });
+    endpointRequested,
+    ...options?.logContext,
+  };
 
-  try {
+  const sendToEndpoint = async (endpoint: WhatsAppEndpoint) => {
     const res = await fetch(
-      `${GRAPH_API_BASE}/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
+      `${GRAPH_API_BASE}/${WHATSAPP_PHONE_NUMBER_ID}/${endpoint.path}`,
       {
         method: "POST",
         headers: {
@@ -146,25 +178,139 @@ export async function sendWhatsAppTemplate(
 
     const data = await res.json();
 
-    console.log("[WhatsApp] API Response:", {
+    return {
+      endpoint: endpoint.mode,
+      ok: res.ok,
       status: res.status,
-      data: data,
+      statusText: res.statusText,
+      data,
+      messageId: data?.messages?.[0]?.id as string | undefined,
+      errorMessage:
+        data?.error?.message || `HTTP ${res.status}: ${res.statusText}`,
+    };
+  };
+
+  console.log("[WhatsApp] Sending template message:", {
+    ...baseLogContext,
+    endpointPrimary: primaryEndpoint.mode,
+    fallbackEnabled: allowFallback,
+  });
+
+  try {
+    const primaryResult = await sendToEndpoint(primaryEndpoint);
+
+    console.log("[WhatsApp] API Response:", {
+      endpointUsed: primaryResult.endpoint,
+      status: primaryResult.status,
+      data: primaryResult.data,
     });
 
-    if (!res.ok) {
-      const errMsg =
-        data?.error?.message || `HTTP ${res.status}: ${res.statusText}`;
-      console.error("[WhatsApp] Send failed:", errMsg);
-      console.error("[WhatsApp] Full error details:", data?.error);
-      return { success: false, error: errMsg };
+    if (primaryResult.ok) {
+      console.log("[WhatsApp] Message sent successfully:", primaryResult.messageId);
+      console.info("[WhatsApp][Compare] Delivery route result:", {
+        ...baseLogContext,
+        endpointUsed: primaryResult.endpoint,
+        fallbackUsed: false,
+        success: true,
+      });
+
+      return {
+        success: true,
+        whatsappMessageId: primaryResult.messageId,
+        endpointRequested,
+        endpointUsed: primaryResult.endpoint,
+        fallbackUsed: false,
+      };
     }
 
-    const messageId = data?.messages?.[0]?.id;
-    console.log("[WhatsApp] Message sent successfully:", messageId);
-    return { success: true, whatsappMessageId: messageId };
+    if (allowFallback) {
+      console.warn("[WhatsApp] marketing_messages failed, trying /messages fallback", {
+        ...baseLogContext,
+        primaryStatus: primaryResult.status,
+        primaryError: primaryResult.errorMessage,
+      });
+
+      const fallbackResult = await sendToEndpoint(fallbackEndpoint);
+
+      console.log("[WhatsApp] Fallback API Response:", {
+        endpointUsed: fallbackResult.endpoint,
+        status: fallbackResult.status,
+        data: fallbackResult.data,
+      });
+
+      if (fallbackResult.ok) {
+        console.log("[WhatsApp] Message sent successfully (fallback):", fallbackResult.messageId);
+        console.info("[WhatsApp][Compare] Delivery route result:", {
+          ...baseLogContext,
+          endpointUsed: fallbackResult.endpoint,
+          fallbackUsed: true,
+          primaryFailedStatus: primaryResult.status,
+          success: true,
+        });
+
+        return {
+          success: true,
+          whatsappMessageId: fallbackResult.messageId,
+          endpointRequested,
+          endpointUsed: fallbackResult.endpoint,
+          fallbackUsed: true,
+        };
+      }
+
+      console.error("[WhatsApp] Send failed on both endpoints", {
+        primary: {
+          endpoint: primaryResult.endpoint,
+          status: primaryResult.status,
+          error: primaryResult.errorMessage,
+        },
+        fallback: {
+          endpoint: fallbackResult.endpoint,
+          status: fallbackResult.status,
+          error: fallbackResult.errorMessage,
+        },
+      });
+
+      console.info("[WhatsApp][Compare] Delivery route result:", {
+        ...baseLogContext,
+        endpointUsed: fallbackResult.endpoint,
+        fallbackUsed: true,
+        success: false,
+      });
+
+      return {
+        success: false,
+        error: fallbackResult.errorMessage,
+        endpointRequested,
+        endpointUsed: fallbackResult.endpoint,
+        fallbackUsed: true,
+      };
+    }
+
+    console.error("[WhatsApp] Send failed:", primaryResult.errorMessage);
+    console.error("[WhatsApp] Full error details:", primaryResult.data?.error);
+    console.info("[WhatsApp][Compare] Delivery route result:", {
+      ...baseLogContext,
+      endpointUsed: primaryResult.endpoint,
+      fallbackUsed: false,
+      success: false,
+    });
+
+    return {
+      success: false,
+      error: primaryResult.errorMessage,
+      endpointRequested,
+      endpointUsed: primaryResult.endpoint,
+      fallbackUsed: false,
+    };
   } catch (err: any) {
     console.error("[WhatsApp] Network error:", err);
-    return { success: false, error: err.message || "Network error" };
+    return {
+      success: false,
+      error: err.message || "Network error",
+      endpointRequested,
+      endpointUsed: primaryEndpoint.mode,
+      fallbackUsed: false,
+    };
   }
 }
 

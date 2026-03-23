@@ -39,7 +39,9 @@ export async function GET(
     const delivered = logs.filter((l) => l.status === "delivered").length;
     const read = logs.filter((l) => l.status === "read").length;
     const failed = logs.filter((l) => l.status === "failed").length;
-    const pending = logs.filter((l) => l.status === "queued").length;
+    const pending = logs.filter(
+      (l) => l.status === "queued" || l.status === "sending",
+    ).length;
     const processed = total - pending;
     // "sent" includes sent, delivered, and read (all successfully sent messages)
     const sent = sentOnly + delivered + read;

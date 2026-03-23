@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import type { WhatsAppEndpointMode } from "@/lib/whatsapp";
 
 export interface IMessageLog extends Document {
   jobId: string;
@@ -7,7 +8,10 @@ export interface IMessageLog extends Document {
   templateName: string;
   templateVariables: string[];
   mediaUrl?: string;
-  status: "queued" | "sent" | "delivered" | "read" | "failed";
+  endpointRequested?: WhatsAppEndpointMode;
+  endpointUsed?: WhatsAppEndpointMode;
+  fallbackUsed?: boolean;
+  status: "queued" | "sending" | "sent" | "delivered" | "read" | "failed";
   error?: string;
   whatsappMessageId?: string;
   sentAt?: Date;
@@ -42,9 +46,23 @@ const MessageLogSchema: Schema = new Schema(
       type: String,
       required: false,
     },
+    endpointRequested: {
+      type: String,
+      enum: ["standard", "marketing"],
+      required: false,
+    },
+    endpointUsed: {
+      type: String,
+      enum: ["standard", "marketing"],
+      required: false,
+    },
+    fallbackUsed: {
+      type: Boolean,
+      required: false,
+    },
     status: {
       type: String,
-      enum: ["queued", "sent", "delivered", "read", "failed"],
+      enum: ["queued", "sending", "sent", "delivered", "read", "failed"],
       default: "queued",
     },
     error: {

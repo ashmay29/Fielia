@@ -26,7 +26,7 @@ export async function POST(
     await dbConnect();
 
     const failedLogs = await MessageLog.find({ jobId, status: "failed" })
-      .select("uuid templateName templateVariables mediaUrl")
+      .select("uuid templateName templateVariables mediaUrl endpointRequested")
       .lean();
 
     if (failedLogs.length === 0) {
@@ -62,6 +62,8 @@ export async function POST(
       ? failedLogs[0].templateVariables
       : [];
     const mediaUrl = failedLogs[0].mediaUrl || undefined;
+    const endpointMode =
+      failedLogs[0].endpointRequested === "standard" ? "standard" : "marketing";
 
     // Keep status tracking idempotent: reuse same rows and transition state.
     await MessageLog.updateMany(
@@ -105,6 +107,7 @@ export async function POST(
         templateName,
         templateVariables,
         mediaUrl,
+        endpointMode,
       },
       retries: 3,
     });

@@ -27,7 +27,8 @@ export async function GET() {
       deliveredCount,
       readCount,
       failedCount,
-      pendingCount,
+      queuedCount,
+      sendingCount,
     ] = await Promise.all([
       MessageLog.countDocuments({}),
       MessageLog.countDocuments({ status: "sent" }),
@@ -35,8 +36,10 @@ export async function GET() {
       MessageLog.countDocuments({ status: "read" }),
       MessageLog.countDocuments({ status: "failed" }),
       MessageLog.countDocuments({ status: "queued" }),
+      MessageLog.countDocuments({ status: "sending" }),
     ]);
 
+    const pendingCount = queuedCount + sendingCount;
     const sentCount = sentOnlyCount + deliveredCount + readCount;
 
     const allJobs = {
@@ -65,7 +68,9 @@ export async function GET() {
     const delivered = logs.filter((l) => l.status === "delivered").length;
     const read = logs.filter((l) => l.status === "read").length;
     const failed = logs.filter((l) => l.status === "failed").length;
-    const pending = logs.filter((l) => l.status === "queued").length;
+    const pending = logs.filter(
+      (l) => l.status === "queued" || l.status === "sending",
+    ).length;
     const processed = total - pending;
 
     return NextResponse.json({

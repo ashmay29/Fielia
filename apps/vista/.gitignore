@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+.data
+apps/vista/data
 
 # next.js
 /.next/

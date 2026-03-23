@@ -7,6 +7,7 @@ import {
   BulkWhatsAppResponse,
   CardData,
 } from "@/app/nfc-card/actions";
+import type { WhatsAppEndpointMode } from "@/lib/whatsapp";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,6 +68,8 @@ export default function BulkMessageModal({
     null,
   );
   const [variables, setVariables] = useState<string[]>([]);
+  const [endpointMode, setEndpointMode] =
+    useState<WhatsAppEndpointMode>("marketing");
 
   // Media state
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -209,6 +212,7 @@ export default function BulkMessageModal({
         selectedTemplate.name,
         variables,
         mediaUrl || undefined,
+        endpointMode,
       );
 
       setResult(response);
@@ -375,6 +379,24 @@ export default function BulkMessageModal({
                       ))}
                     </select>
                   )}
+                </div>
+
+                {/* Endpoint Selection */}
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-[#E1D6C7]/70 mb-2">
+                    Delivery Route
+                  </label>
+                  <select
+                    value={endpointMode}
+                    onChange={(e) => setEndpointMode(e.target.value as WhatsAppEndpointMode)}
+                    className="w-full bg-black/40 border border-[#E1D6C7]/30 rounded px-4 py-2.5 text-[#E1D6C7] text-sm focus:outline-none focus:border-[#E1D6C7] transition-colors"
+                  >
+                    <option value="marketing">Marketing API (recommended)</option>
+                    <option value="standard">Standard API (/messages)</option>
+                  </select>
+                  <p className="text-[10px] text-[#E1D6C7]/45 mt-1">
+                    Marketing API falls back to standard automatically if unsupported.
+                  </p>
                 </div>
 
                 {/* Template Preview */}

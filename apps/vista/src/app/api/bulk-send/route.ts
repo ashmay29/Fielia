@@ -45,6 +45,15 @@ const CONFIG = {
   MESSAGE_DELAY_MS: 150,
 };
 
+type BulkSendOverrides = {
+  csvPath?: string;
+  templateName?: string;
+  templateVariables?: string[];
+  mediaUrl?: string | null;
+  messageDelayMs?: number;
+  endpointMode?: "standard" | "marketing";
+};
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -57,21 +66,35 @@ export async function POST(request: NextRequest) {
     skipped = 0;
 
   try {
-    // Get CSV file path
-    const csvPath = path.join(
-      process.cwd(),
-      "data/Bulk message - Sheet1.csv"
-    );
+    const body = (await request.json().catch(() => ({}))) as BulkSendOverrides;
+
+    const resolvedCsvPath = body.csvPath
+      ? path.isAbsolute(body.csvPath)
+        ? body.csvPath
+        : path.join(process.cwd(), body.csvPath)
+      : path.join(process.cwd(), "data/Bulk message - Sheet1.csv");
+
+    const templateName = body.templateName || CONFIG.TEMPLATE_NAME;
+    const templateVariables = Array.isArray(body.templateVariables)
+      ? body.templateVariables
+      : CONFIG.TEMPLATE_BODY_VARIABLES;
+    const mediaUrl =
+      body.mediaUrl === null ? undefined : body.mediaUrl || CONFIG.HEADER_IMAGE_URL;
+    const messageDelayMs =
+      typeof body.messageDelayMs === "number" && body.messageDelayMs >= 0
+        ? body.messageDelayMs
+        : CONFIG.MESSAGE_DELAY_MS;
+    const endpointMode = body.endpointMode === "standard" ? "standard" : "marketing";
 
     // Read and parse CSV
-    if (!fs.existsSync(csvPath)) {
+    if (!fs.existsSync(resolvedCsvPath)) {
       return NextResponse.json(
-        { error: `CSV file not found at ${csvPath}` },
+        { error: `CSV file not found at ${resolvedCsvPath}` },
         { status: 400 }
       );
     }
 
-    const fileContent = fs.readFileSync(csvPath, "utf-8");
+    const fileContent = fs.readFileSync(resolvedCsvPath, "utf-8");
     const records = parse(fileContent, {
       columns: true,
       skip_empty_lines: true,
@@ -117,9 +140,12 @@ export async function POST(request: NextRequest) {
       try {
         const result = await sendWhatsAppTemplate(
           normalizedPhone,
-          CONFIG.TEMPLATE_NAME,
-          CONFIG.TEMPLATE_BODY_VARIABLES,
-          CONFIG.HEADER_IMAGE_URL
+          templateName,
+          templateVariables,
+          mediaUrl,
+          {
+            endpointMode,
+          }
         );
 
         if (result.success) {
@@ -157,7 +183,7 @@ export async function POST(request: NextRequest) {
 
       // Rate limiting delay
       if (i < records.length - 1) {
-        await sleep(CONFIG.MESSAGE_DELAY_MS);
+        await sleep(messageDelayMs);
       }
     }
 
@@ -172,7 +198,12 @@ export async function POST(request: NextRequest) {
     const resultsFile = path.join(logsDir, "bulk-send-results.json");
     const report = {
       metadata: {
-        templateName: CONFIG.TEMPLATE_NAME,
+        templateName,
+        templateVariables,
+        csvPath: resolvedCsvPath,
+        messageDelayMs,
+        mediaUrl: mediaUrl || null,
+        endpointMode,
         timestamp: new Date().toISOString(),
         duration: duration + "s",
       },

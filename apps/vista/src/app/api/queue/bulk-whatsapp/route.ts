@@ -4,6 +4,7 @@ import dbConnect from "@/lib/db";
 import Card from "@/models/Card";
 import MessageLog from "@/models/MessageLog";
 import { sendWhatsAppTemplate } from "@/lib/whatsapp";
+import type { WhatsAppEndpointMode } from "@/lib/whatsapp";
 
 const receiver = new Receiver({
   currentSigningKey: process.env.UPSTASH_QSTASH_CURRENT_SIGNING_KEY!,
@@ -19,6 +20,10 @@ const INTER_MESSAGE_DELAY_MS = Math.max(
 const INTER_BATCH_DELAY_MS = Math.max(
   0,
   Number(process.env.WHATSAPP_INTER_BATCH_DELAY_MS || "1000"),
+);
+const SENDING_STALE_AFTER_MS = Math.max(
+  60_000,
+  Number(process.env.WHATSAPP_SENDING_STALE_AFTER_MS || "600000"),
 );
 
 function sleep(ms: number) {
@@ -70,13 +75,17 @@ export async function POST(request: NextRequest) {
       templateName,
       templateVariables,
       mediaUrl,
+      endpointMode,
     }: {
       jobId: string;
       uuids: string[];
       templateName: string;
       templateVariables: string[];
       mediaUrl?: string;
+      endpointMode?: WhatsAppEndpointMode;
     } = payload;
+
+    const requestedEndpoint: WhatsAppEndpointMode = endpointMode || "marketing";
 
     if (!jobId || !uuids?.length || !templateName) {
       return NextResponse.json(
@@ -96,13 +105,44 @@ export async function POST(request: NextRequest) {
       cards.map((c: any) => [c.uuid, c.phone as string]),
     );
 
+    const staleSendingBefore = new Date(Date.now() - SENDING_STALE_AFTER_MS);
+
     // Process in batches with throttling to avoid API burst failures.
     for (let i = 0; i < uuids.length; i += BATCH_SIZE) {
       const batch = uuids.slice(i, i + BATCH_SIZE);
 
       for (let batchIndex = 0; batchIndex < batch.length; batchIndex++) {
         const uuid = batch[batchIndex];
-        const phone = cardMap.get(uuid);
+
+        // Idempotency guard: atomically claim a recipient before sending so queue
+        // redeliveries cannot send the same recipient twice for the same job.
+        const claimedLog = await MessageLog.findOneAndUpdate(
+          {
+            jobId,
+            uuid,
+            $or: [
+              { status: "queued" },
+              { status: "sending", updatedAt: { $lt: staleSendingBefore } },
+            ],
+          },
+          {
+            $set: {
+              status: "sending",
+              endpointRequested: requestedEndpoint,
+              updatedAt: new Date(),
+            },
+            $unset: {
+              error: "",
+            },
+          },
+          { new: true },
+        ).lean();
+
+        if (!claimedLog) {
+          continue;
+        }
+
+        const phone = cardMap.get(uuid) || claimedLog.phone;
 
         if (!phone) {
           // This shouldn't happen since we pre-validated, but handle gracefully
@@ -124,6 +164,14 @@ export async function POST(request: NextRequest) {
             templateName,
             templateVariables,
             mediaUrl,
+            {
+              endpointMode: requestedEndpoint,
+              allowFallbackToStandard: true,
+              logContext: {
+                jobId,
+                uuid,
+              },
+            },
           );
 
           if (result.success) {
@@ -133,6 +181,9 @@ export async function POST(request: NextRequest) {
                 $set: {
                   status: "sent",
                   whatsappMessageId: result.whatsappMessageId,
+                  endpointRequested: result.endpointRequested || requestedEndpoint,
+                  endpointUsed: result.endpointUsed || requestedEndpoint,
+                  fallbackUsed: result.fallbackUsed || false,
                   sentAt: new Date(),
                 },
               },
@@ -152,6 +203,15 @@ export async function POST(request: NextRequest) {
                 templateName,
                 templateVariables,
                 mediaUrl,
+                {
+                  endpointMode: requestedEndpoint,
+                  allowFallbackToStandard: true,
+                  logContext: {
+                    jobId,
+                    uuid,
+                    retryAfterRateLimit: true,
+                  },
+                },
               );
 
               if (retry.success) {
@@ -161,6 +221,9 @@ export async function POST(request: NextRequest) {
                     $set: {
                       status: "sent",
                       whatsappMessageId: retry.whatsappMessageId,
+                      endpointRequested: retry.endpointRequested || requestedEndpoint,
+                      endpointUsed: retry.endpointUsed || requestedEndpoint,
+                      fallbackUsed: retry.fallbackUsed || false,
                       sentAt: new Date(),
                     },
                   },
@@ -171,6 +234,9 @@ export async function POST(request: NextRequest) {
                   {
                     $set: {
                       status: "failed",
+                      endpointRequested: retry.endpointRequested || requestedEndpoint,
+                      endpointUsed: retry.endpointUsed || requestedEndpoint,
+                      fallbackUsed: retry.fallbackUsed || false,
                       error: retry.error || "Failed after rate-limit retry",
                     },
                   },
@@ -182,6 +248,9 @@ export async function POST(request: NextRequest) {
                 {
                   $set: {
                     status: "failed",
+                    endpointRequested: result.endpointRequested || requestedEndpoint,
+                    endpointUsed: result.endpointUsed || requestedEndpoint,
+                    fallbackUsed: result.fallbackUsed || false,
                     error: result.error || "Unknown send error",
                   },
                 },
@@ -194,6 +263,7 @@ export async function POST(request: NextRequest) {
             {
               $set: {
                 status: "failed",
+                endpointRequested: requestedEndpoint,
                 error: err.message || "Unexpected error",
               },
             },
@@ -214,7 +284,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const endpointStats = await MessageLog.aggregate([
+      { $match: { jobId } },
+      {
+        $group: {
+          _id: {
+            endpointRequested: "$endpointRequested",
+            endpointUsed: "$endpointUsed",
+            status: "$status",
+            fallbackUsed: "$fallbackUsed",
+          },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
     console.log(`[BulkWA] Job ${jobId} completed — ${uuids.length} messages processed`);
+    console.log("[BulkWA][Compare] Endpoint delivery summary:", endpointStats);
     return NextResponse.json({ status: "completed", jobId });
   } catch (error) {
     console.error("[BulkWA] Error processing job:", error);

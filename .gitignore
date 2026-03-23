@@ -53,3 +53,7 @@ next-env.d.ts
 # Misc
 .cache/
 .temp/
+
+# Local data exports/imports (keep out of repo)
+/apps/vista/data/
+apps/vista/data/**
