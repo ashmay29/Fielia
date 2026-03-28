@@ -54,27 +54,36 @@ export default function CurtainReveal({
 
 function DesktopCurtains({ onComplete }: { onComplete: () => void }) {
   // Create vertical fold pattern (pleats) for desktop
-  const foldCount = 12;
+  const foldCount = 16;
   const folds = Array.from({ length: foldCount }, (_, i) => {
     const position = (i / foldCount) * 100;
+    const isPeak = i % 2 === 0;
+    const depth = 0.9 + (i % 4) * 0.04;
     return {
       position: `${position}%`,
       // Extremely smooth gradient with 60+ micro-steps - invisible transitions
       gradient: `linear-gradient(90deg, ${CURTAIN_GRADIENT_STOPS})`,
+      isPeak,
+      depth,
     };
   });
 
   return (
     <>
+      <div className="curtain-valance" />
+
       <motion.div
         className="curtain curtain-left"
-        initial={{ x: 0 }}
-        animate={{ x: "-100%" }}
+        initial={{ x: 0, skewY: 0, scaleX: 1 }}
+        animate={{ x: "-102%", skewY: -1, scaleX: 0.985 }}
         transition={{
-          duration: 2.6,
-          ease: [0.76, 0, 0.24, 1],
+          duration: 2.75,
+          ease: [0.7, 0, 0.2, 1],
         }}
       >
+        <div className="curtain-sheen-left" />
+        <div className="curtain-depth-left" />
+
         {/* Vertical folds/pleats with dynamic width (narrower at top, wider at bottom) */}
         {folds.map((fold, i) => (
           <div
@@ -84,6 +93,12 @@ function DesktopCurtains({ onComplete }: { onComplete: () => void }) {
               left: fold.position,
               width: `${100 / foldCount}%`,
               background: fold.gradient,
+              opacity: fold.isPeak ? 0.98 : 0.84,
+              transform: `scaleY(${fold.depth})`,
+              transformOrigin: "top",
+              boxShadow: fold.isPeak
+                ? "inset 1px 0 5px rgba(255,255,255,0.06), inset -3px 0 10px rgba(0,0,0,0.35)"
+                : "inset 1px 0 4px rgba(255,255,255,0.03), inset -2px 0 12px rgba(0,0,0,0.45)",
               // Clip-path creates curtain draping: narrower at top (15-85%), wider at bottom (0-100%)
               clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)",
             }}
@@ -93,15 +108,18 @@ function DesktopCurtains({ onComplete }: { onComplete: () => void }) {
 
       <motion.div
         className="curtain curtain-right"
-        initial={{ x: 0 }}
-        animate={{ x: "100%" }}
+        initial={{ x: 0, skewY: 0, scaleX: 1 }}
+        animate={{ x: "102%", skewY: 1, scaleX: 0.985 }}
         transition={{
-          duration: 2.6,
-          delay: 0.14,
-          ease: [0.76, 0, 0.24, 1],
+          duration: 2.75,
+          delay: 0.12,
+          ease: [0.7, 0, 0.2, 1],
         }}
         onAnimationComplete={onComplete}
       >
+        <div className="curtain-sheen-right" />
+        <div className="curtain-depth-right" />
+
         {/* Vertical folds/pleats with dynamic width */}
         {folds.map((fold, i) => (
           <div
@@ -111,6 +129,12 @@ function DesktopCurtains({ onComplete }: { onComplete: () => void }) {
               left: fold.position,
               width: `${100 / foldCount}%`,
               background: fold.gradient,
+              opacity: fold.isPeak ? 0.98 : 0.84,
+              transform: `scaleY(${fold.depth})`,
+              transformOrigin: "top",
+              boxShadow: fold.isPeak
+                ? "inset -1px 0 5px rgba(255,255,255,0.06), inset 3px 0 10px rgba(0,0,0,0.35)"
+                : "inset -1px 0 4px rgba(255,255,255,0.03), inset 2px 0 12px rgba(0,0,0,0.45)",
               // Clip-path creates curtain draping: narrower at top (15-85%), wider at bottom (0-100%)
               clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)",
             }}
@@ -123,27 +147,34 @@ function DesktopCurtains({ onComplete }: { onComplete: () => void }) {
 
 function MobileCurtains({ onComplete }: { onComplete: () => void }) {
   // Create horizontal fold pattern (pleats) for mobile
-  const foldCount = 10;
+  const foldCount = 12;
   const folds = Array.from({ length: foldCount }, (_, i) => {
     const position = (i / foldCount) * 100;
+    const isPeak = i % 2 === 0;
     return {
       position: `${position}%`,
       // Extremely smooth gradient (vertical) with 60+ micro-steps - invisible transitions
       gradient: `linear-gradient(180deg, ${CURTAIN_GRADIENT_STOPS})`,
+      isPeak,
     };
   });
 
   return (
     <>
+      <div className="curtain-valance curtain-valance-mobile" />
+
       <motion.div
         className="curtain curtain-top"
-        initial={{ y: 0 }}
-        animate={{ y: "-100%" }}
+        initial={{ y: 0, scaleY: 1 }}
+        animate={{ y: "-102%", scaleY: 0.985 }}
         transition={{
-          duration: 2.2,
-          ease: [0.76, 0, 0.24, 1],
+          duration: 2.35,
+          ease: [0.7, 0, 0.2, 1],
         }}
       >
+        <div className="curtain-sheen-top" />
+        <div className="curtain-depth-top" />
+
         {/* Horizontal folds/pleats */}
         {folds.map((fold, i) => (
           <div
@@ -153,6 +184,10 @@ function MobileCurtains({ onComplete }: { onComplete: () => void }) {
               top: fold.position,
               height: `${100 / foldCount}%`,
               background: fold.gradient,
+              opacity: fold.isPeak ? 0.98 : 0.85,
+              boxShadow: fold.isPeak
+                ? "inset 0 1px 4px rgba(255,255,255,0.07), inset 0 -3px 8px rgba(0,0,0,0.35)"
+                : "inset 0 1px 3px rgba(255,255,255,0.03), inset 0 -3px 10px rgba(0,0,0,0.42)",
             }}
           />
         ))}
@@ -160,15 +195,18 @@ function MobileCurtains({ onComplete }: { onComplete: () => void }) {
 
       <motion.div
         className="curtain curtain-bottom"
-        initial={{ y: 0 }}
-        animate={{ y: "100%" }}
+        initial={{ y: 0, scaleY: 1 }}
+        animate={{ y: "102%", scaleY: 0.985 }}
         transition={{
-          duration: 2.2,
+          duration: 2.35,
           delay: 0.12,
-          ease: [0.76, 0, 0.24, 1],
+          ease: [0.7, 0, 0.2, 1],
         }}
         onAnimationComplete={onComplete}
       >
+        <div className="curtain-sheen-bottom" />
+        <div className="curtain-depth-bottom" />
+
         {/* Horizontal folds/pleats */}
         {folds.map((fold, i) => (
           <div
@@ -178,6 +216,10 @@ function MobileCurtains({ onComplete }: { onComplete: () => void }) {
               top: fold.position,
               height: `${100 / foldCount}%`,
               background: fold.gradient,
+              opacity: fold.isPeak ? 0.98 : 0.85,
+              boxShadow: fold.isPeak
+                ? "inset 0 -1px 4px rgba(255,255,255,0.07), inset 0 3px 8px rgba(0,0,0,0.35)"
+                : "inset 0 -1px 3px rgba(255,255,255,0.03), inset 0 3px 10px rgba(0,0,0,0.42)",
             }}
           />
         ))}

@@ -12,7 +12,6 @@ import {
 import { loginAdmin, logoutAdmin } from "../admin/actions";
 import { motion } from "framer-motion";
 import BulkMessageModal from "@/components/nfc/BulkMessageModal";
-import MessageInsightsPanel from "@/components/nfc/MessageInsightsPanel";
 import UserSelectionTable from "@/components/nfc/UserSelectionTable";
 
 export default function NfcCardPage() {
@@ -105,31 +104,31 @@ export default function NfcCardPage() {
 
   const handleExportContacts = async () => {
     try {
-      const response = await fetch('/api/contacts/export', {
-        credentials: 'same-origin',
+      const response = await fetch("/api/contacts/export", {
+        credentials: "same-origin",
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to export contacts');
+        throw new Error("Failed to export contacts");
       }
-      
+
       // Get the blob from the response
       const blob = await response.blob();
-      
+
       // Create a download link and trigger it
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'contacts.vcf';
+      a.download = "contacts.vcf";
       document.body.appendChild(a);
       a.click();
-      
+
       // Clean up
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Error exporting contacts:', error);
-      alert('Failed to export contacts. Please try again.');
+      console.error("Error exporting contacts:", error);
+      alert("Failed to export contacts. Please try again.");
     }
   };
 
@@ -156,15 +155,15 @@ export default function NfcCardPage() {
     new Set(
       allCards
         .map((card) => card.preference)
-        .filter((pref) => pref && pref.trim() !== "")
-    )
+        .filter((pref) => pref && pref.trim() !== ""),
+    ),
   ).sort();
 
   // Check if any filters are active
-  const hasActiveFilters = 
-    filters.nameFilter !== "all" || 
-    filters.phoneFilter !== "all" || 
-    filters.addressFilter !== "all" || 
+  const hasActiveFilters =
+    filters.nameFilter !== "all" ||
+    filters.phoneFilter !== "all" ||
+    filters.addressFilter !== "all" ||
     filters.preferenceFilter !== "all";
 
   const filteredCards = allCards.filter((card) => {
@@ -181,27 +180,45 @@ export default function NfcCardPage() {
     // Name filter
     const matchesName =
       filters.nameFilter === "all" ||
-      (filters.nameFilter === "firstName" && card.firstName && card.firstName.trim() !== "") ||
-      (filters.nameFilter === "lastName" && card.lastName && card.lastName.trim() !== "");
+      (filters.nameFilter === "firstName" &&
+        card.firstName &&
+        card.firstName.trim() !== "") ||
+      (filters.nameFilter === "lastName" &&
+        card.lastName &&
+        card.lastName.trim() !== "");
 
     // Phone filter
     const matchesPhone =
       filters.phoneFilter === "all" ||
-      (filters.phoneFilter === "with" && card.phone && card.phone.trim() !== "") ||
-      (filters.phoneFilter === "without" && (!card.phone || card.phone.trim() === ""));
+      (filters.phoneFilter === "with" &&
+        card.phone &&
+        card.phone.trim() !== "") ||
+      (filters.phoneFilter === "without" &&
+        (!card.phone || card.phone.trim() === ""));
 
     // Address filter
     const matchesAddress =
       filters.addressFilter === "all" ||
-      (filters.addressFilter === "with" && card.address && card.address.trim() !== "") ||
-      (filters.addressFilter === "without" && (!card.address || card.address.trim() === ""));
+      (filters.addressFilter === "with" &&
+        card.address &&
+        card.address.trim() !== "") ||
+      (filters.addressFilter === "without" &&
+        (!card.address || card.address.trim() === ""));
 
     // Preference filter
     const matchesPreference =
       filters.preferenceFilter === "all" ||
-      (card.preference && card.preference.toLowerCase() === filters.preferenceFilter.toLowerCase());
+      (card.preference &&
+        card.preference.toLowerCase() ===
+          filters.preferenceFilter.toLowerCase());
 
-    return matchesSearch && matchesName && matchesPhone && matchesAddress && matchesPreference;
+    return (
+      matchesSearch &&
+      matchesName &&
+      matchesPhone &&
+      matchesAddress &&
+      matchesPreference
+    );
   });
 
   // Toggle User List View
@@ -560,15 +577,23 @@ export default function NfcCardPage() {
                 <h2 className="text-2xl font-serif text-[#E1D6C7]">
                   Enrolled Users
                 </h2>
-                <div className="flex items-center gap-3" role="status" aria-live="polite">
+                <div
+                  className="flex items-center gap-3"
+                  role="status"
+                  aria-live="polite"
+                >
                   <span className="text-xs uppercase tracking-wider text-[#E1D6C7]/70 font-semibold">
-                    Total: <span className="text-[#C5A572]">{allCards.length}</span>
+                    Total:{" "}
+                    <span className="text-[#C5A572]">{allCards.length}</span>
                   </span>
                   {(searchQuery || hasActiveFilters) && (
                     <>
                       <span className="text-[#E1D6C7]/30">|</span>
                       <span className="text-xs uppercase tracking-wider text-[#E1D6C7]/70 font-semibold">
-                        Showing: <span className="text-[#C5A572]">{filteredCards.length}</span>
+                        Showing:{" "}
+                        <span className="text-[#C5A572]">
+                          {filteredCards.length}
+                        </span>
                       </span>
                     </>
                   )}
@@ -593,16 +618,24 @@ export default function NfcCardPage() {
                 )}
               </div>
             </div>
-            
+
             {/* Filter Dropdowns */}
             <div className="flex flex-wrap gap-3 items-center bg-black/20 p-4 rounded-lg border border-[#E1D6C7]/10">
               <span className="text-xs uppercase tracking-wider text-[#E1D6C7]/70 font-semibold">
                 Filters:
               </span>
-              
+
               <select
                 value={filters.nameFilter}
-                onChange={(e) => setFilters({ ...filters, nameFilter: e.target.value as "all" | "firstName" | "lastName" })}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    nameFilter: e.target.value as
+                      | "all"
+                      | "firstName"
+                      | "lastName",
+                  })
+                }
                 className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
               >
                 <option value="all">All Names</option>
@@ -612,7 +645,12 @@ export default function NfcCardPage() {
 
               <select
                 value={filters.phoneFilter}
-                onChange={(e) => setFilters({ ...filters, phoneFilter: e.target.value as "all" | "with" | "without" })}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    phoneFilter: e.target.value as "all" | "with" | "without",
+                  })
+                }
                 className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
               >
                 <option value="all">All Phone Numbers</option>
@@ -622,7 +660,12 @@ export default function NfcCardPage() {
 
               <select
                 value={filters.addressFilter}
-                onChange={(e) => setFilters({ ...filters, addressFilter: e.target.value as "all" | "with" | "without" })}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    addressFilter: e.target.value as "all" | "with" | "without",
+                  })
+                }
                 className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
               >
                 <option value="all">All Addresses</option>
@@ -632,7 +675,9 @@ export default function NfcCardPage() {
 
               <select
                 value={filters.preferenceFilter}
-                onChange={(e) => setFilters({ ...filters, preferenceFilter: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, preferenceFilter: e.target.value })
+                }
                 className="bg-black/40 border border-[#E1D6C7]/30 rounded px-3 py-1.5 text-[#E1D6C7] text-xs focus:outline-none focus:border-[#E1D6C7] transition-colors"
               >
                 <option value="all">All Preferences</option>
@@ -645,12 +690,14 @@ export default function NfcCardPage() {
 
               {hasActiveFilters && (
                 <button
-                  onClick={() => setFilters({
-                    nameFilter: "all",
-                    phoneFilter: "all",
-                    addressFilter: "all",
-                    preferenceFilter: "all",
-                  })}
+                  onClick={() =>
+                    setFilters({
+                      nameFilter: "all",
+                      phoneFilter: "all",
+                      addressFilter: "all",
+                      preferenceFilter: "all",
+                    })
+                  }
                   className="ml-auto px-3 py-1.5 text-xs text-[#E1D6C7]/70 hover:text-[#E1D6C7] border border-[#E1D6C7]/30 hover:border-[#E1D6C7] rounded transition-colors"
                 >
                   Clear Filters
@@ -694,8 +741,18 @@ export default function NfcCardPage() {
                 onClick={() => setShowBulkModal(true)}
                 className="flex items-center gap-2 px-6 py-3 bg-[#C5A572] text-[#1a0505] rounded-full font-bold text-sm uppercase tracking-wider shadow-lg hover:bg-[#E1D6C7] transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
                 Bulk Message ({selectedUuids.length})
               </button>
@@ -714,8 +771,6 @@ export default function NfcCardPage() {
               }}
             />
           )}
-
-          <MessageInsightsPanel className="fixed z-40 bottom-16 left-4 right-4 sm:right-auto sm:left-6 sm:w-[360px]" />
         </div>
       ) : (
         /* Scanner View (existing content wrapped) */

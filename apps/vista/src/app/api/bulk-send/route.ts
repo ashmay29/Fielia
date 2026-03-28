@@ -45,6 +45,23 @@ const CONFIG = {
   MESSAGE_DELAY_MS: 150,
 };
 
+const DATA_DIR = path.join(process.cwd(), "data");
+const DEFAULT_CSV_FILE = "Bulk message - Sheet1.csv";
+
+function resolveCsvPath(csvPath?: string): string {
+  if (!csvPath) {
+    return path.join(DATA_DIR, DEFAULT_CSV_FILE);
+  }
+
+  const candidate = csvPath.trim();
+  if (!candidate) {
+    return path.join(DATA_DIR, DEFAULT_CSV_FILE);
+  }
+
+  // Restrict file access to the data directory and avoid broad trace patterns.
+  return path.join(DATA_DIR, path.basename(candidate));
+}
+
 type BulkSendOverrides = {
   csvPath?: string;
   templateName?: string;
@@ -68,11 +85,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json().catch(() => ({}))) as BulkSendOverrides;
 
-    const resolvedCsvPath = body.csvPath
-      ? path.isAbsolute(body.csvPath)
-        ? body.csvPath
-        : path.join(process.cwd(), body.csvPath)
-      : path.join(process.cwd(), "data/Bulk message - Sheet1.csv");
+    const resolvedCsvPath = resolveCsvPath(body.csvPath);
 
     const templateName = body.templateName || CONFIG.TEMPLATE_NAME;
     const templateVariables = Array.isArray(body.templateVariables)

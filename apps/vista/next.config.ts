@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  outputFileTracingExcludes: {
+    "/api/bulk-send": ["./public/**/*"],
+  },
 };
 
 export default nextConfig;

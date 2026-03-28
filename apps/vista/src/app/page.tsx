@@ -2,56 +2,51 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import CurtainReveal from "@/components/landing/CurtainReveal";
 import EntranceText from "@/components/landing/EntranceText";
 import MainWebsite from "@/components/landing/MainWebsite";
 
+// All images used by MainWebsite — preloaded while the entrance text is showing
+const PRELOAD_IMAGES = [
+  "/satinbg.jpeg",
+  "/interior/DSC02056-Edit.jpg",
+  "/interior/DSC02076-Edit.jpg",
+  "/interior/DSC02065-Edit.jpg",
+  "/interior/DSC02069-Edit-2.jpg",
+  "/F&B/Illuminati.JPG",
+  "/F&B/Red Card.JPG",
+  "/F&B/Stolen Kohinoor.JPG",
+];
+
 export default function HomePage() {
-  const [curtainDone, setCurtainDone] = useState(false);
   const [showText, setShowText] = useState(false);
   const [showSite, setShowSite] = useState(false);
 
   useEffect(() => {
-    // Check session storage on mount
     const hasSeenIntro = sessionStorage.getItem("hasSeenIntro");
+
     if (hasSeenIntro) {
-      setCurtainDone(true);
-      setShowText(false);
+      // Skip intro entirely on revisit
       setShowSite(true);
-    }
-  }, []);
+    } else {
+      // Show entrance text immediately, then reveal site
+      setShowText(true);
 
-  useEffect(() => {
-    let textTimeout: ReturnType<typeof setTimeout> | undefined;
-    let siteTimeout: ReturnType<typeof setTimeout> | undefined;
+      // Preload all images in the background
+      PRELOAD_IMAGES.forEach((src) => {
+        const img = new window.Image();
+        img.src = src;
+      });
 
-    if (curtainDone) {
-      if (!sessionStorage.getItem("hasSeenIntro")) {
-        // First time visiting: play sequence
-        // Text appears 400ms after curtains
-        textTimeout = setTimeout(() => setShowText(true), 400);
-        // Site appears after text completes (400ms delay + 4800ms animation + 200ms buffer = 5400ms)
-        siteTimeout = setTimeout(() => {
-          setShowSite(true);
-          sessionStorage.setItem("hasSeenIntro", "true");
-        }, 5400);
-      } else {
-        // Already seen: ensure immediate state consistency just in case
+      // Show site after entrance text finishes (3.2s fade-in + 1s hold + 0.6s fade-out = ~4.8s + small buffer)
+      const siteTimeout = setTimeout(() => {
         setShowText(false);
         setShowSite(true);
-      }
-    } else {
-      // Reset state if curtainDone becomes false again
-      if (showText) setShowText(false);
-      if (showSite) setShowSite(false);
-    }
+        sessionStorage.setItem("hasSeenIntro", "true");
+      }, 5000);
 
-    return () => {
-      if (textTimeout !== undefined) clearTimeout(textTimeout);
-      if (siteTimeout !== undefined) clearTimeout(siteTimeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [curtainDone]);
+      return () => clearTimeout(siteTimeout);
+    }
+  }, []);
 
   return (
     <div
@@ -68,11 +63,11 @@ export default function HomePage() {
           backgroundRepeat: "no-repeat",
         }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: curtainDone ? 1 : 0 }}
+        animate={{ opacity: showText || showSite ? 1 : 0 }}
         transition={{
-          duration: 6,
-          delay: 0.8,
-          ease: [0.16, 1, 0.3, 1], // Ultra-smooth exponential ease for organic feel
+          duration: 4,
+          delay: 0.3,
+          ease: [0.16, 1, 0.3, 1],
         }}
       />
 
@@ -85,15 +80,10 @@ export default function HomePage() {
         }}
       />
 
-      {/* Stage 1: Curtain Reveal */}
-      {!curtainDone && (
-        <CurtainReveal onComplete={() => setCurtainDone(true)} />
-      )}
-
-      {/* Stage 2: "You may enter" Text */}
+      {/* Stage 1: "You may enter" Text */}
       {showText && <EntranceText startDelay={0} />}
 
-      {/* Stage 3: Main Website */}
+      {/* Stage 2: Main Website */}
       {showSite && <MainWebsite isVisible={showSite} />}
     </div>
   );
