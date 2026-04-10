@@ -14,12 +14,6 @@ if (!MONGODB_URI) {
 }
 
 // Card Schema
-interface ICard extends Document {
-  firstName: string;
-  lastName: string;
-  phone: string;
-}
-
 const CardSchema = new mongoose.Schema({
   uuid: { type: String, required: true, unique: true, index: true },
   firstName: { type: String, required: true },
@@ -59,8 +53,17 @@ async function exportMembersToExcel() {
 
     // Add headers
     worksheet.columns = [
-      { header: 'Name', key: 'name', width: 30 },
+      { header: 'UUID', key: 'uuid', width: 38 },
+      { header: 'First Name', key: 'firstName', width: 20 },
+      { header: 'Last Name', key: 'lastName', width: 20 },
       { header: 'Contact Number', key: 'phone', width: 20 },
+      { header: 'Address', key: 'address', width: 40 },
+      { header: 'Preference', key: 'preference', width: 20 },
+      { header: 'Date of Birth', key: 'dob', width: 15 },
+      { header: 'Anniversary', key: 'anniversary', width: 15 },
+      { header: 'Content', key: 'content', width: 30 },
+      { header: 'Created At', key: 'createdAt', width: 22 },
+      { header: 'Updated At', key: 'updatedAt', width: 22 },
     ];
 
     // Style header row
@@ -73,12 +76,18 @@ async function exportMembersToExcel() {
 
     // Add data rows
     members.forEach((member: any) => {
-      const fullName = `${member.firstName || ''} ${member.lastName || ''}`.trim();
-      const phone = member.phone || '';
-
       worksheet.addRow({
-        name: fullName,
-        phone: phone,
+        uuid: member.uuid || '',
+        firstName: member.firstName || '',
+        lastName: member.lastName || '',
+        phone: member.phone || '',
+        address: member.address || '',
+        preference: member.preference || '',
+        dob: member.dob ? new Date(member.dob).toISOString().split('T')[0] : '',
+        anniversary: member.anniversary ? new Date(member.anniversary).toISOString().split('T')[0] : '',
+        content: member.content || '',
+        createdAt: member.createdAt ? new Date(member.createdAt).toISOString() : '',
+        updatedAt: member.updatedAt ? new Date(member.updatedAt).toISOString() : '',
       });
     });
 
