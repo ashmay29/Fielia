@@ -85,30 +85,36 @@ export default function RootLayout({
             so this strip supplies the details a no-JS reader would otherwise
             never see — full street address, contact number, operating entity. */}
         <footer
-          className="relative z-10 border-t border-white/10 px-6 py-6 text-center text-xs text-white/50"
-          style={{
-            backgroundColor: "hsl(350 40% 8%)",
-            fontFamily: "var(--font-cormorant), serif",
-            letterSpacing: "0.14em",
-            lineHeight: 2,
-          }}
+          className="relative z-10 w-full overflow-hidden border-t border-[#370D10]/10 bg-[#E1D6C7] px-6 py-5 text-center text-[9px] uppercase tracking-[0.2em] text-[#370D10]/80 md:text-xs"
+          style={{ fontFamily: "var(--font-cormorant), serif" }}
         >
-          <p>
-            Mahalaxmi Racecourse, Keshavrao Khadye Marg, Mumbai 400034
-            <span className="mx-2 opacity-40" aria-hidden="true">
-              &middot;
-            </span>
-            WhatsApp:{" "}
-            <a
-              href="https://wa.me/917738354663"
-              className="underline underline-offset-2 transition-colors duration-300 hover:text-white/80"
-            >
-              +91 77383 54663
-            </a>
-          </p>
-          <p className="text-white/40">
-            Operated by Innercircle Hospitality LLP
-          </p>
+          {/* Same satin texture the parchment footer uses, so the two read as
+              one continuous surface rather than two stacked blocks. */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-10 mix-blend-multiply"
+            style={{
+              backgroundImage: "url('/satinbg.jpeg')",
+              backgroundSize: "cover",
+            }}
+            aria-hidden="true"
+          />
+
+          <div className="relative z-10 space-y-1">
+            <p>
+              Mahalaxmi Racecourse, Keshavrao Khadye Marg, Mumbai 400034
+              <span className="mx-2 opacity-40" aria-hidden="true">
+                &middot;
+              </span>
+              WhatsApp:{" "}
+              <a
+                href="https://wa.me/917738354663"
+                className="font-bold text-[#370D10] underline underline-offset-2 transition-colors duration-300 hover:text-black"
+              >
+                +91 77383 54663
+              </a>
+            </p>
+            <p>Operated by Innercircle Hospitality LLP</p>
+          </div>
         </footer>
 
         <script
