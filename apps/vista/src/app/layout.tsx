@@ -79,19 +79,25 @@ export default function RootLayout({
         {children}
 
         {/* Server-rendered identity block. Must stay outside any client
-            component or Suspense boundary so it is present in the raw HTML. */}
+            component or Suspense boundary so it is present in the raw HTML.
+            Deliberately terse: the parchment footer inside MainWebsite already
+            carries the trading name and city, but it only mounts client-side,
+            so this strip supplies the details a no-JS reader would otherwise
+            never see — full street address, contact number, operating entity. */}
         <footer
-          className="relative z-10 border-t border-white/10 px-6 py-10 text-center text-xs text-white/50"
+          className="relative z-10 border-t border-white/10 px-6 py-6 text-center text-xs text-white/50"
           style={{
             backgroundColor: "hsl(350 40% 8%)",
             fontFamily: "var(--font-cormorant), serif",
             letterSpacing: "0.14em",
-            lineHeight: 2.1,
+            lineHeight: 2,
           }}
         >
-          <p>Fielia — an invite-only bar and supper club</p>
-          <p>Mahalaxmi Racecourse, Keshavrao Khadye Marg, Mumbai 400034</p>
           <p>
+            Mahalaxmi Racecourse, Keshavrao Khadye Marg, Mumbai 400034
+            <span className="mx-2 opacity-40" aria-hidden="true">
+              &middot;
+            </span>
             WhatsApp:{" "}
             <a
               href="https://wa.me/917738354663"
@@ -100,7 +106,9 @@ export default function RootLayout({
               +91 77383 54663
             </a>
           </p>
-          <p>© 2026 Fielia. Operated by Innercircle Hospitality LLP.</p>
+          <p className="text-white/40">
+            Operated by Innercircle Hospitality LLP
+          </p>
         </footer>
 
         <script
