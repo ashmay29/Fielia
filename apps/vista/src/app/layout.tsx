@@ -6,6 +6,7 @@ import {
   Monsieur_La_Doulaise,
   Quintessential,
 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -77,6 +78,7 @@ export default function RootLayout({
         className={`${playfair.variable} ${cormorant.variable} ${greatVibes.variable} ${monsieurLaDoulaise.variable} ${quintessential.variable} antialiased`}
       >
         {children}
+        <Analytics />
 
         {/* Server-rendered identity block. Must stay outside any client
             component or Suspense boundary so it is present in the raw HTML.
